@@ -10,8 +10,11 @@
       let
         gnome2 = import ./pkgs/gnome2 {
           inherit (pkgs)
+            bison
             buildEnv
             fetchurl
+            flex
+            glib
             iconnamingutils
             intltool
             lib
