@@ -17,6 +17,7 @@ in
   GConf = gnomeSource "GConf" "2.32" "GConf-2.32.0.tar.bz2" "sha256-VN0d1/SZKKnMQldL727wSBdTdw/BmYbcIAS7t/rJd6A=";
   gnome-desktop = desktopSource "gnome-desktop-2.32.0.tar.bz2" "sha256-ZtenjmEtmmV47N/aeqjBgMx2wDKgNN+E90KUSiCQPiU=";
   gnome-menus = desktopSource "gnome-menus-2.30.4.tar.bz2" "sha256-MXl9c8k+xPMILYRHxsK23CkAnEpPOscHWZnDh9xLDJ4=";
+  gnome-session = desktopSource "gnome-session-2.32.0.tar.bz2" "sha256-S3V1dDAwYsulYM/+ymVOzNTtDdFj7+eTpKPvtoIt6iU=";
   gnome-mime-data = gnomeSource "gnome-mime-data" "2.18" "gnome-mime-data-2.18.0.tar.bz2" "sha256-NxlrWzcIW7zUXDOMNuJomP413Vl1KV9p9IAosehDb9c=";
   gnome-vfs = gnomeSource "gnome-vfs" "2.24" "gnome-vfs-2.24.4.tar.bz2" "sha256-Yt5ktbgE6wQQT/mPzWqLcnbVEKSfvZwP61aPiZZET6o=";
   libIDL = gnomeSource "libIDL" "0.8" "libIDL-0.8.14.tar.bz2" "sha256-xdJNjAllRjU/vHzt8gg5LVoCr+nVbrzBzMsljXxNIiA=";

@@ -5,6 +5,7 @@
   bison,
   buildEnv,
   bzip2,
+  coreutils,
   dbus-glib,
   flex,
   gettext,
@@ -15,6 +16,7 @@
   intltool,
   libcanberra,
   libgcrypt,
+  libSM,
   libstartup_notification,
   libx11,
   libxcomposite,
@@ -29,6 +31,7 @@
   perlPackages,
   popt,
   python3,
+  upower,
   which,
   zenity,
 }:
@@ -569,6 +572,46 @@ let
     };
   };
 
+  gnome-session = stdenv.mkDerivation rec {
+    pname = "gnome-session";
+    version = "2.32.0";
+
+    src = sources.gnome-session;
+
+    patches = [ ./patches/gnome-session-disable-obsolete-upower-actions.patch ];
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      dbus-glib
+      glib
+      gtk2
+      libgnomeui
+      libSM
+      libstartup_notification
+      libx11
+      upower
+    ];
+
+    env = {
+      GCONF_SANITY_CHECK = "${coreutils}/bin/true";
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+    };
+
+    meta = {
+      description = "GNOME 2 session manager";
+      homepage = "https://download.gnome.org/sources/gnome-session/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -591,7 +634,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libwnck metacity;
+  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-session gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libwnck metacity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -601,6 +644,7 @@ rec {
       gnome-desktop
       gnome-mime-data
       gnome-menus
+      gnome-session
       gnome-vfs
       gnome-icon-theme
       libart_lgpl

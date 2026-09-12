@@ -13,6 +13,7 @@
             bison
             buildEnv
             bzip2
+            coreutils
             dbus-glib
             fetchurl
             flex
@@ -24,6 +25,7 @@
             lib
             libcanberra
             libgcrypt
+            libSM
             libstartup_notification
             libx11
             libxcomposite
@@ -39,6 +41,7 @@
             pkg-config
             python3
             stdenv
+            upower
             which
             zenity;
           gnomeDocUtils = pkgs.gnome-doc-utils;

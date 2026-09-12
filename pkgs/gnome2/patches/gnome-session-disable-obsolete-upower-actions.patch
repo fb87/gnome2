@@ -1,0 +1,74 @@
+diff --git a/gnome-session/gsm-logout-dialog.c b/gnome-session/gsm-logout-dialog.c
+index 7f4882a..8d563c3 100644
+--- a/gnome-session/gsm-logout-dialog.c
++++ b/gnome-session/gsm-logout-dialog.c
+@@ -182,13 +182,13 @@ gsm_logout_dialog_destroy (GsmLogoutDialog *logout_dialog,
+ static gboolean
+ gsm_logout_supports_system_suspend (GsmLogoutDialog *logout_dialog)
+ {
+-        return up_client_get_can_suspend (logout_dialog->priv->up_client);
++        return FALSE;
+ }
+ 
+ static gboolean
+ gsm_logout_supports_system_hibernate (GsmLogoutDialog *logout_dialog)
+ {
+-        return up_client_get_can_hibernate (logout_dialog->priv->up_client);
++        return FALSE;
+ }
+ 
+ static gboolean
+diff --git a/gnome-session/gsm-manager.c b/gnome-session/gsm-manager.c
+index 95d52d4..d9da603 100644
+--- a/gnome-session/gsm-manager.c
++++ b/gnome-session/gsm-manager.c
+@@ -983,48 +983,14 @@ manager_perhaps_lock (GsmManager *manager)
+ static void
+ manager_attempt_hibernate (GsmManager *manager)
+ {
+-        gboolean  can_hibernate;
+-        GError   *error;
+-        gboolean  ret;
+-
+-        can_hibernate = up_client_get_can_hibernate (manager->priv->up_client);
+-        if (can_hibernate) {
+-
+-                /* lock the screen before we suspend */
+-                manager_perhaps_lock (manager);
+-
+-                error = NULL;
+-                ret = up_client_hibernate_sync (manager->priv->up_client, NULL, &error);
+-                if (!ret) {
+-                        g_warning ("Unexpected hibernate failure: %s",
+-                                   error->message);
+-                        g_error_free (error);
+-                }
+-        }
++        g_warning ("Hibernate is disabled: current UPower no longer provides the GNOME 2 API");
+ }
+ 
+ static void
+ manager_attempt_suspend (GsmManager *manager)
+ {
+-        gboolean  can_suspend;
+-        GError   *error;
+-        gboolean  ret;
+-
+-        can_suspend = up_client_get_can_suspend (manager->priv->up_client);
+-        if (can_suspend) {
+-
+-                /* lock the screen before we suspend */
+-                manager_perhaps_lock (manager);
+-
+-                error = NULL;
+-                ret = up_client_suspend_sync (manager->priv->up_client, NULL, &error);
+-                if (!ret) {
+-                        g_warning ("Unexpected suspend failure: %s",
+-                                   error->message);
+-                        g_error_free (error);
+-                }
+-        }
++        g_warning ("Suspend is disabled: current UPower no longer provides the GNOME 2 API");
+ }
+ 
+ static void
