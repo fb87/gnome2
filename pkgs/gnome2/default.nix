@@ -411,6 +411,33 @@ let
     };
   };
 
+  gnome-menus = stdenv.mkDerivation rec {
+    pname = "gnome-menus";
+    version = "2.30.4";
+
+    src = sources.gnome-menus;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [ glib ];
+
+    configureFlags = [ "--disable-python" ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 menu layout and desktop entry library";
+      homepage = "https://download.gnome.org/sources/gnome-menus/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -433,7 +460,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-icon-theme gnome-mime-data gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui;
+  inherit GConf ORBit2 gnome-icon-theme gnome-menus gnome-mime-data gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -441,6 +468,7 @@ rec {
       GConf
       ORBit2
       gnome-mime-data
+      gnome-menus
       gnome-vfs
       gnome-icon-theme
       libart_lgpl
