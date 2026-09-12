@@ -18,10 +18,12 @@
             flex
             gettext
             glib
+            gtk2
             iconnamingutils
             intltool
             lib
             libcanberra
+            libgcrypt
             libxml2
             perlPackages
             popt
