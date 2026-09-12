@@ -15,6 +15,10 @@
   intltool,
   libcanberra,
   libgcrypt,
+  libstartup_notification,
+  libx11,
+  libxext,
+  libxres,
   pkg-config,
   libxml2,
   perlPackages,
@@ -480,6 +484,38 @@ let
     };
   };
 
+  libwnck = stdenv.mkDerivation rec {
+    pname = "libwnck";
+    version = "2.30.5";
+
+    src = sources.libwnck;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      glib
+      gtk2
+      libstartup_notification
+      libx11
+      libxext
+      libxres
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 window navigator construction kit";
+      homepage = "https://download.gnome.org/sources/libwnck/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -502,7 +538,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui;
+  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libwnck;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -522,6 +558,7 @@ rec {
       libgnome-keyring
       libgnomecanvas
       libgnomeui
+      libwnck
     ];
   };
 }

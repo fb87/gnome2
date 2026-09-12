@@ -24,6 +24,10 @@
             lib
             libcanberra
             libgcrypt
+            libstartup_notification
+            libx11
+            libxext
+            libxres
             libxml2
             perlPackages
             popt
