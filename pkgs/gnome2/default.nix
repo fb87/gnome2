@@ -27,6 +27,7 @@
   libxdamage,
   libxext,
   libxfixes,
+  libxklavier,
   libxrender,
   libxres,
   pkg-config,
@@ -829,6 +830,79 @@ let
     };
   };
 
+  gnome-settings-daemon = stdenv.mkDerivation rec {
+    pname = "gnome-settings-daemon";
+    version = "2.32.0";
+
+    src = sources.gnome-settings-daemon;
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      dbus-glib
+      glib
+      gnome-desktop
+      gtk2
+      libgnomekbd
+      libgnomeui
+      libICE
+      libSM
+      libx11
+      libxklavier
+    ];
+
+    configureFlags = [
+      "--disable-scrollkeeper"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 settings daemon";
+      homepage = "https://download.gnome.org/sources/gnome-settings-daemon/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  libgnomekbd = stdenv.mkDerivation rec {
+    pname = "libgnomekbd";
+    version = "2.32.0";
+
+    src = sources.libgnomekbd;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gtk2
+      libxklavier
+      libxml2
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 keyboard configuration library";
+      homepage = "https://download.gnome.org/sources/libgnomekbd/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -851,7 +925,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-panel gnome-session gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libgweather libsoup libunique libwnck metacity nautilus;
+  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-panel gnome-session gnome-settings-daemon gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeui libgweather libsoup libunique libwnck metacity nautilus;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -863,6 +937,7 @@ rec {
       gnome-menus
       gnome-panel
       gnome-session
+      gnome-settings-daemon
       gnome-vfs
       gnome-icon-theme
       libart_lgpl
@@ -872,6 +947,7 @@ rec {
       libgnome
       libgnome-keyring
       libgnomecanvas
+      libgnomekbd
       libgnomeui
       libgweather
       libsoup

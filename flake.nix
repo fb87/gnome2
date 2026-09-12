@@ -36,6 +36,7 @@
             libxdamage
             libxext
             libxfixes
+            libxklavier
             libxrender
             libxres
             libxml2
