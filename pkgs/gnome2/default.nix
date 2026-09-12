@@ -13,6 +13,7 @@
   pkg-config,
   libxml2,
   perlPackages,
+  popt,
 }:
 
 let
@@ -100,6 +101,39 @@ let
     };
   };
 
+  libbonobo = stdenv.mkDerivation rec {
+    pname = "libbonobo";
+    version = "2.32.0";
+
+    src = sources.libbonobo;
+
+    nativeBuildInputs = [
+      bison
+      flex
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      glib
+      libxml2
+      popt
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "Bonobo component framework library for GNOME 2";
+      homepage = "https://download.gnome.org/sources/libbonobo/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -122,7 +156,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-icon-theme libIDL;
+  inherit GConf ORBit2 gnome-icon-theme libIDL libbonobo;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -130,6 +164,7 @@ rec {
       GConf
       ORBit2
       gnome-icon-theme
+      libbonobo
     ];
   };
 }

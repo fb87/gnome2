@@ -22,6 +22,7 @@
             lib
             libxml2
             perlPackages
+            popt
             pkg-config
             stdenv;
         };
