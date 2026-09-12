@@ -24,6 +24,7 @@
             intltool
             lib
             libcanberra
+            libexif
             libgcrypt
             libICE
             librsvg
@@ -42,6 +43,7 @@
             popt
             pkg-config
             python3
+            shared-mime-info
             stdenv
             tzdata
             upower

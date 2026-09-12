@@ -15,6 +15,7 @@
   iconnamingutils,
   intltool,
   libcanberra,
+  libexif,
   libgcrypt,
   libICE,
   librsvg,
@@ -33,6 +34,7 @@
   perlPackages,
   popt,
   python3,
+  shared-mime-info,
   tzdata,
   upower,
   which,
@@ -743,6 +745,90 @@ let
     };
   };
 
+  libunique = stdenv.mkDerivation rec {
+    pname = "libunique";
+    version = "1.1.6";
+
+    src = sources.libunique;
+
+    hardeningDisable = [ "format" ];
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      dbus-glib
+      glib
+      gtk2
+    ];
+
+    configureFlags = [
+      "--enable-debug=no"
+      "--enable-maintainer-flags=no"
+      "--disable-dbus"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-error=deprecated-declarations";
+
+    meta = {
+      description = "Single instance support library for GTK 2 applications";
+      homepage = "https://download.gnome.org/sources/libunique/";
+      license = lib.licenses.lgpl21Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  nautilus = stdenv.mkDerivation rec {
+    pname = "nautilus";
+    version = "2.32.0";
+
+    src = sources.nautilus;
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+      shared-mime-info
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gnome-desktop
+      gnome-menus
+      gnome-vfs
+      gtk2
+      libexif
+      libgnomeui
+      libICE
+      libSM
+      libunique
+      libxml2
+    ];
+
+    configureFlags = [
+      "--disable-scrollkeeper"
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+      NIX_LDFLAGS = "-lgmodule-2.0";
+    };
+
+    meta = {
+      description = "GNOME 2 file manager";
+      homepage = "https://download.gnome.org/sources/nautilus/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -765,7 +851,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-panel gnome-session gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libgweather libsoup libwnck metacity;
+  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-panel gnome-session gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libgweather libsoup libunique libwnck metacity nautilus;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -789,8 +875,10 @@ rec {
       libgnomeui
       libgweather
       libsoup
+      libunique
       libwnck
       metacity
+      nautilus
     ];
   };
 }
