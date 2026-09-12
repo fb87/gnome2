@@ -1,0 +1,24 @@
+diff --git a/gnome-panel/nothing.cP b/gnome-panel/nothing.cP
+index d0f0e1d..58d1113 100644
+--- a/gnome-panel/nothing.cP
++++ b/gnome-panel/nothing.cP
+@@ -5,13 +5,13 @@
+ #include <X11/Xlib.h>
+ #include <cairo.h>
+ #include <gdk/gdkkeysyms.h>
+-#include <canberra-gtk.h>
+ 
+-#ifdef CA_CHECK_VERSION
+-#if CA_CHECK_VERSION(0, 13)
+-#define HAVE_CANBERRA_GTK_MULTIHEAD_SAFE
+-#endif
+-#endif
++#define ca_context_cancel(context, id) ((void) 0)
++#define ca_gtk_context_get() NULL
++#define ca_gtk_context_get_for_screen(screen) NULL
++#define ca_gtk_play_for_widget(widget, id, ...) ((void) 0)
++#define CA_PROP_EVENT_ID ""
++#define CA_PROP_EVENT_DESCRIPTION ""
+ 
+ #include "panel-util.h"
+ #include "nothing.h"

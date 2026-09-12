@@ -25,6 +25,8 @@
             lib
             libcanberra
             libgcrypt
+            libICE
+            librsvg
             libSM
             libstartup_notification
             libx11
@@ -41,6 +43,7 @@
             pkg-config
             python3
             stdenv
+            tzdata
             upower
             which
             zenity;

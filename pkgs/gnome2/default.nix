@@ -16,6 +16,8 @@
   intltool,
   libcanberra,
   libgcrypt,
+  libICE,
+  librsvg,
   libSM,
   libstartup_notification,
   libx11,
@@ -31,6 +33,7 @@
   perlPackages,
   popt,
   python3,
+  tzdata,
   upower,
   which,
   zenity,
@@ -612,6 +615,134 @@ let
     };
   };
 
+  gnome-panel = stdenv.mkDerivation rec {
+    pname = "gnome-panel";
+    version = "2.32.0.2";
+
+    src = sources.gnome-panel;
+
+    patches = [ ./patches/gnome-panel-disable-canberra.patch ];
+
+    postPatch = ''
+      substituteInPlace configure configure.ac \
+        --replace-fail " libcanberra-gtk" ""
+      substituteInPlace Makefile.in \
+        --replace-fail "doc help icons" "doc icons"
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+      python3
+      which
+    ];
+
+    buildInputs = [
+      GConf
+      dbus-glib
+      glib
+      gnome-desktop
+      gnome-menus
+      gtk2
+      libbonoboui
+      libgnomeui
+      libgweather
+      libICE
+      librsvg
+      libSM
+      libwnck
+      libx11
+      libxml2
+    ];
+
+    configureFlags = [
+      "--disable-scrollkeeper"
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+      NIX_LDFLAGS = "-lgmodule-2.0 -lm -lX11";
+    };
+
+    meta = {
+      description = "GNOME 2 desktop panel";
+      homepage = "https://download.gnome.org/sources/gnome-panel/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  libgweather = stdenv.mkDerivation rec {
+    pname = "libgweather";
+    version = "2.30.3";
+
+    src = sources.libgweather;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gtk2
+      libsoup
+      libxml2
+    ];
+
+    configureFlags = [
+      "--with-zoneinfo-dir=${tzdata}/share/zoneinfo"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 weather library";
+      homepage = "https://download.gnome.org/sources/libgweather/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  libsoup = stdenv.mkDerivation rec {
+    pname = "libsoup";
+    version = "2.32.0";
+
+    src = sources.libsoup;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      glib
+      libxml2
+    ];
+
+    configureFlags = [
+      "--disable-ssl"
+      "--without-gnome"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 HTTP client/server library";
+      homepage = "https://download.gnome.org/sources/libsoup/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -634,7 +765,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-session gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libwnck metacity;
+  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-panel gnome-session gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libgweather libsoup libwnck metacity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -644,6 +775,7 @@ rec {
       gnome-desktop
       gnome-mime-data
       gnome-menus
+      gnome-panel
       gnome-session
       gnome-vfs
       gnome-icon-theme
@@ -655,6 +787,8 @@ rec {
       libgnome-keyring
       libgnomecanvas
       libgnomeui
+      libgweather
+      libsoup
       libwnck
       metacity
     ];
