@@ -12,6 +12,7 @@
           inherit (pkgs)
             bison
             buildEnv
+            bzip2
             dbus-glib
             fetchurl
             flex
@@ -20,6 +21,7 @@
             iconnamingutils
             intltool
             lib
+            libcanberra
             libxml2
             perlPackages
             popt

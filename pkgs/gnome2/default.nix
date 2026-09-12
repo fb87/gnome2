@@ -4,12 +4,14 @@
   fetchurl,
   bison,
   buildEnv,
+  bzip2,
   dbus-glib,
   flex,
   gettext,
   glib,
   iconnamingutils,
   intltool,
+  libcanberra,
   pkg-config,
   libxml2,
   perlPackages,
@@ -134,6 +136,101 @@ let
     };
   };
 
+  gnome-mime-data = stdenv.mkDerivation rec {
+    pname = "gnome-mime-data";
+    version = "2.18.0";
+
+    src = sources.gnome-mime-data;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    meta = {
+      description = "GNOME 2 MIME and application database";
+      homepage = "https://download.gnome.org/sources/gnome-mime-data/";
+      license = lib.licenses.gpl2Only;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gnome-vfs = stdenv.mkDerivation rec {
+    pname = "gnome-vfs";
+    version = "2.24.4";
+
+    src = sources.gnome-vfs;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      bzip2
+      dbus-glib
+      gnome-mime-data
+      glib
+      libxml2
+    ];
+
+    configureFlags = [
+      "--disable-avahi"
+      "--disable-fam"
+      "--disable-hal"
+      "--disable-samba"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 virtual file system library";
+      homepage = "https://download.gnome.org/sources/gnome-vfs/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  libgnome = stdenv.mkDerivation rec {
+    pname = "libgnome";
+    version = "2.32.0";
+
+    src = sources.libgnome;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      gnome-vfs
+      glib
+      libbonobo
+      libcanberra
+      libxml2
+      popt
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "Core GNOME 2 library";
+      homepage = "https://download.gnome.org/sources/libgnome/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -156,15 +253,18 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-icon-theme libIDL libbonobo;
+  inherit GConf ORBit2 gnome-icon-theme gnome-mime-data gnome-vfs libIDL libbonobo libgnome;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
     paths = [
       GConf
       ORBit2
+      gnome-mime-data
+      gnome-vfs
       gnome-icon-theme
       libbonobo
+      libgnome
     ];
   };
 }
