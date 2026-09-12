@@ -12,12 +12,15 @@
           inherit (pkgs)
             bison
             buildEnv
+            dbus-glib
             fetchurl
             flex
+            gettext
             glib
             iconnamingutils
             intltool
             lib
+            libxml2
             perlPackages
             pkg-config
             stdenv;

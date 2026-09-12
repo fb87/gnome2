@@ -4,11 +4,14 @@
   fetchurl,
   bison,
   buildEnv,
+  dbus-glib,
   flex,
+  gettext,
   glib,
   iconnamingutils,
   intltool,
   pkg-config,
+  libxml2,
   perlPackages,
 }:
 
@@ -64,6 +67,39 @@ let
     };
   };
 
+  GConf = stdenv.mkDerivation rec {
+    pname = "GConf";
+    version = "2.32.0";
+
+    src = sources.GConf;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      ORBit2
+      dbus-glib
+      glib
+      libxml2
+    ];
+
+    configureFlags = [
+      "--disable-defaults-service"
+      "--disable-gsettings-backend"
+    ];
+
+    meta = {
+      description = "GNOME 2 configuration database system";
+      homepage = "https://download.gnome.org/sources/GConf/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -86,11 +122,12 @@ let
   };
 in
 rec {
-  inherit ORBit2 gnome-icon-theme libIDL;
+  inherit GConf ORBit2 gnome-icon-theme libIDL;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
     paths = [
+      GConf
       ORBit2
       gnome-icon-theme
     ];
