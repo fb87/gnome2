@@ -17,7 +17,12 @@
   libgcrypt,
   libstartup_notification,
   libx11,
+  libxcomposite,
+  libxcursor,
+  libxdamage,
   libxext,
+  libxfixes,
+  libxrender,
   libxres,
   pkg-config,
   libxml2,
@@ -25,6 +30,7 @@
   popt,
   python3,
   which,
+  zenity,
 }:
 
 let
@@ -516,6 +522,53 @@ let
     };
   };
 
+  metacity = stdenv.mkDerivation rec {
+    pname = "metacity";
+    version = "2.30.3";
+
+    src = sources.metacity;
+
+    patches = [ ./patches/metacity-disable-canberra.patch ];
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gtk2
+      libstartup_notification
+      libwnck
+      libx11
+      libxcomposite
+      libxcursor
+      libxdamage
+      libxext
+      libxfixes
+      libxrender
+      zenity
+    ];
+
+    configureFlags = [
+      "--disable-compositor"
+      "--disable-scrollkeeper"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "Metacity window manager for GNOME 2";
+      homepage = "https://download.gnome.org/sources/metacity/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -538,7 +591,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libwnck;
+  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui libwnck metacity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -559,6 +612,7 @@ rec {
       libgnomecanvas
       libgnomeui
       libwnck
+      metacity
     ];
   };
 }

@@ -26,7 +26,12 @@
             libgcrypt
             libstartup_notification
             libx11
+            libxcomposite
+            libxcursor
+            libxdamage
             libxext
+            libxfixes
+            libxrender
             libxres
             libxml2
             perlPackages
@@ -34,7 +39,8 @@
             pkg-config
             python3
             stdenv
-            which;
+            which
+            zenity;
           gnomeDocUtils = pkgs.gnome-doc-utils;
         };
       in

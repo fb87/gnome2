@@ -29,6 +29,7 @@ in
   libgnomecanvas = gnomeSource "libgnomecanvas" "2.30" "libgnomecanvas-2.30.3.tar.bz2" "sha256-hZt44ISJ/OTVwVxnb+wc15eC8RX1Fuiti+1qvLje3UA=";
   libgnomeui = gnomeSource "libgnomeui" "2.24" "libgnomeui-2.24.5.tar.bz2" "sha256-rjUvJJWInmVSTJeZMskJ9GKaWOZCkPsMlTMzcyJdPA8=";
   libwnck = desktopSource "libwnck-2.30.5.tar.bz2" "sha256-VrZoHonNRUkbtkAWXWInbYE2mgiXQEKyZkXcHg6VTME=";
+  metacity = desktopSource "metacity-2.30.3.tar.bz2" "sha256-CPiHAY+l5EfPGE0DuuP+LAX9t1g77Wdo47TWY5L8GN0=";
   ORBit2 = gnomeSource "ORBit2" "2.14" "ORBit2-2.14.19.tar.bz2" "sha256-VckAqQVIKZJzD1dfPu801QvacXwZfJfAj6Wm6v2FdVA=";
   gnome-icon-theme = desktopSource "gnome-icon-theme-2.31.0.tar.bz2" "sha256-6n4Ft36tFZN5OSs7J1ygycus19k2AU5EfMfF4np2eYI=";
 }
