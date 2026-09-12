@@ -10,6 +10,7 @@
   gettext,
   glib,
   gtk2,
+  gnomeDocUtils,
   iconnamingutils,
   intltool,
   libcanberra,
@@ -18,6 +19,8 @@
   libxml2,
   perlPackages,
   popt,
+  python3,
+  which,
 }:
 
 let
@@ -438,6 +441,45 @@ let
     };
   };
 
+  gnome-desktop = stdenv.mkDerivation rec {
+    pname = "gnome-desktop";
+    version = "2.32.0";
+
+    src = sources.gnome-desktop;
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+      python3
+      which
+    ];
+
+    buildInputs = [
+      GConf
+      gnome-menus
+      gtk2
+      libgnomeui
+      libxml2
+    ];
+
+    configureFlags = [
+      "--disable-desktop-docs"
+      "--disable-scrollkeeper"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 desktop library and data files";
+      homepage = "https://download.gnome.org/sources/gnome-desktop/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -460,13 +502,14 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-icon-theme gnome-menus gnome-mime-data gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui;
+  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomeui;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
     paths = [
       GConf
       ORBit2
+      gnome-desktop
       gnome-mime-data
       gnome-menus
       gnome-vfs

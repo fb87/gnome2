@@ -28,7 +28,10 @@
             perlPackages
             popt
             pkg-config
-            stdenv;
+            python3
+            stdenv
+            which;
+          gnomeDocUtils = pkgs.gnome-doc-utils;
         };
       in
       gnome2 // {
