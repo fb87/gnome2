@@ -58,4 +58,14 @@ in
   gst-plugins-base = desktopSource "gst-plugins-base-0.10.30.tar.bz2" "sha256-Y5OGQTgL6ZNcgEro1VrNz9k5IO0t63Lc9w8Ceniwhdc=";
   gst-plugins-good = desktopSource "gst-plugins-good-0.10.25.tar.bz2" "sha256-tdV1DBJBLEfYW6k5HIQvbwLK2VEYdmleSLFfs35GmfY=";
   gvfs = desktopSource "gvfs-1.6.4.tar.bz2" "sha256-4eKBBni0LLAWBkLwzTPM03fN37GPyGjW+qBMRJ+BNpM=";
+  alacarte = desktopSource "alacarte-0.13.2.tar.bz2" "sha256-n6NuUYGx7qlHsYTLD3nXlrJcxaXxIoGaGsL/Abx+5O0=";
+  bug-buddy = desktopSource "bug-buddy-2.32.0.tar.bz2" "sha256-/9xw/kpZwK70K1sLcrCPF9srHZ9JuitociM03b7l48o=";
+  dasher = desktopSource "dasher-4.11.tar.bz2" "sha256-+yHMTvYG4QqOXe/+voaVo3bquwdm19G9+Aq8XwP0/tI=";
+  gcalctool = desktopSource "gcalctool-5.32.0.tar.bz2" "sha256-dMPInHmKa9aGs409BugRmMU30EwKF3ETD405nVI0tGM=";
+  gconf-editor = desktopSource "gconf-editor-2.32.0.tar.bz2" "sha256-xtHTXOXRNhIa127+HEAzQluyrTgA5xG9G8qc6GnBKh8=";
+  gnome-netstatus = desktopSource "gnome-netstatus-2.28.2.tar.bz2" "sha256-0a0KZooTRImNT0e1WRrd3HeR7bbC6SE268+NJ42VkRk=";
+  gnome-nettool = desktopSource "gnome-nettool-2.32.0.tar.bz2" "sha256-jHD4WVJ2AXARSy+kvjzKo/ximPgCus2iUD7UgrigU5w=";
+  gok = desktopSource "gok-2.30.1.tar.bz2" "sha256-ZCLe24DCyz1e5HI4Inlg3A5t3g0NE1HMfRHeBgicNsA=";
+  mousetweaks = desktopSource "mousetweaks-2.32.0.tar.bz2" "sha256-h05m3Af1+gp6MqMq5WuzR+71hD11yUpjy0rTlC+bUEc=";
+  zenity = desktopSource "zenity-2.32.0.tar.bz2" "sha256-kXUWdqAZQuxEV4YiXlzMHEug7TDTO4sXfhzbAUtOOu8=";
 }

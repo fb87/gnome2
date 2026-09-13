@@ -18,6 +18,7 @@
             dbus
             dbus-glib
             desktop-file-utils
+            elfutils
             fetchurl
             fontconfig
             flex

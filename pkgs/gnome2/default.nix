@@ -10,6 +10,7 @@
   dbus,
   dbus-glib,
   desktop-file-utils,
+  elfutils,
   flex,
   fontconfig,
   gettext,
@@ -879,6 +880,282 @@ let
     };
   };
 
+  zenity = stdenv.mkDerivation rec {
+    pname = "zenity";
+    version = "2.32.0";
+
+    src = sources.zenity;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail $'SUBDIRS = \\\n\tsrc\t\\\n\tpo\t\\\n\tdata\t\\\n\thelp' \
+                        $'SUBDIRS = \\\n\tsrc\t\\\n\tpo\t\\\n\tdata'
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      glib
+      gtk2
+      libx11
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 dialog-box scripting tool";
+      homepage = "https://download.gnome.org/sources/zenity/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gcalctool = stdenv.mkDerivation rec {
+    pname = "gcalctool";
+    version = "5.32.0";
+
+    src = sources.gcalctool;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = po src data help" "SUBDIRS = po src data"
+    '';
+
+    nativeBuildInputs = [
+      bison
+      flex
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      glib
+      gtk2
+      libxml2
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 desktop calculator";
+      homepage = "https://download.gnome.org/sources/gcalctool/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gconf-editor = stdenv.mkDerivation rec {
+    pname = "gconf-editor";
+    version = "2.32.0";
+
+    src = sources.gconf-editor;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = data src po docs" "SUBDIRS = data src po"
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      dbus-glib
+      gtk2
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 GConf configuration database editor";
+      homepage = "https://download.gnome.org/sources/gconf-editor/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gnome-nettool = stdenv.mkDerivation rec {
+    pname = "gnome-nettool";
+    version = "2.32.0";
+
+    src = sources.gnome-nettool;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = pixmaps data src help po" "SUBDIRS = pixmaps data src po"
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gtk2
+      libgtop
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 network diagnostic tool";
+      homepage = "https://download.gnome.org/sources/gnome-nettool/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gnome-netstatus = stdenv.mkDerivation rec {
+    pname = "gnome-netstatus";
+    version = "2.28.2";
+
+    src = sources.gnome-netstatus;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = src icons help po packaging" "SUBDIRS = src icons po packaging"
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      gnome-panel
+      gtk2
+      libart_lgpl
+      libbonobo
+      libbonoboui
+      libgnome
+      libgnomecanvas
+      popt
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-unused-result -Wno-error=format-security";
+      NIX_LDFLAGS = "-lm";
+    };
+
+    meta = {
+      description = "GNOME 2 network status panel applet";
+      homepage = "https://download.gnome.org/sources/gnome-netstatus/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  bug-buddy = stdenv.mkDerivation rec {
+    pname = "bug-buddy";
+    version = "2.32.0";
+
+    src = sources.bug-buddy;
+
+    configureFlags = [
+      "--disable-eds"
+    ];
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      elfutils
+      glib
+      gtk2
+      libbonobo
+      libgtop
+      libsoup
+      libxml2
+      popt
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 crash reporting tool";
+      homepage = "https://download.gnome.org/sources/bug-buddy/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  mousetweaks = stdenv.mkDerivation rec {
+    pname = "mousetweaks";
+    version = "2.32.0";
+
+    src = sources.mousetweaks;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = src data pixmaps po help man" "SUBDIRS = src data pixmaps po man"
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      glib
+      gnome-panel
+      gtk2
+      libXtst
+      libart_lgpl
+      libbonobo
+      libbonoboui
+      libgnome
+      libgnomecanvas
+      libxcursor
+      libxfixes
+      popt
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 mouse accessibility enhancements (dwell click, pointer capture)";
+      homepage = "https://download.gnome.org/sources/mousetweaks/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   vte = stdenv.mkDerivation rec {
     pname = "vte";
     version = "0.26.0";
@@ -1046,6 +1323,15 @@ let
         --replace-fail " libcanberra-gtk" ""
       substituteInPlace Makefile.in \
         --replace-fail "doc help icons" "doc icons"
+      # bonobo/panel-module's Makefile.am builds libpanel_applets_bonobo_la
+      # from just $(BONOBO_CFLAGS) (ORBit-2.0 + libbonoboui-2.0), but
+      # panel-applets-bonobo-module.c pulls in panel-gconf.h transitively
+      # through applet.h. $(LIBPANEL_APPLET_BONOBO_CFLAGS) -- which does
+      # include gconf-2.0 -- is already substituted into this Makefile.in
+      # (used elsewhere in it), just not wired into this CPPFLAGS list; a
+      # real upstream oversight in this rarely-built legacy compat path.
+      sed -i '/^libpanel_applets_bonobo_la_CPPFLAGS = \\$/{n;s/$/\n\t$(LIBPANEL_APPLET_BONOBO_CFLAGS)\t\\/}' \
+        bonobo/panel-module/Makefile.in
     '';
 
     nativeBuildInputs = [
@@ -1060,12 +1346,17 @@ let
 
     buildInputs = [
       GConf
+      ORBit2
       dbus-glib
       glib
       gnome-desktop
       gnome-menus
       gtk2
+      libart_lgpl
+      libbonobo
       libbonoboui
+      libgnome
+      libgnomecanvas
       libgnomeui
       libgweather
       libICE
@@ -1074,10 +1365,12 @@ let
       libwnck
       libx11
       libxml2
+      popt
     ];
 
     configureFlags = [
       "--disable-scrollkeeper"
+      "--enable-bonobo"
     ];
 
     env = {
@@ -1472,7 +1765,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity nautilus vte;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -1481,10 +1774,15 @@ rec {
       ORBit2
       at-spi2-atk
       at-spi2-core
+      bug-buddy
+      gcalctool
+      gconf-editor
       gnome-control-center
       gnome-desktop
       gnome-mime-data
       gnome-menus
+      gnome-netstatus
+      gnome-nettool
       gnome-panel
       gnome-session
       gnome-settings-daemon
@@ -1497,6 +1795,8 @@ rec {
       gtksourceview
       gucharmap
       gvfs
+      mousetweaks
+      zenity
       libart_lgpl
       libbonobo
       libbonoboui
