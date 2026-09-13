@@ -51,4 +51,11 @@ in
   libgnomeprint = desktopSource "libgnomeprint-2.18.8.tar.bz2" "sha256-EDTshlEFH4TSQk56HaYcUwQizCDOWy2eEH4eRneNlpE=";
   libgnomeprintui = desktopSource "libgnomeprintui-2.18.6.tar.bz2" "sha256-FWrltm5dzFRu+iRJBI95LXbFWzDZOptnsMaWZeNG9Go=";
   libgtop = desktopSource "libgtop-2.28.2.tar.bz2" "sha256-SZWNfaH3ayV7/Q1VfY7Sshilqw0xtZ/tHDLd8qFSn10=";
+  at-spi2-core = desktopSource "at-spi2-core-0.4.0.tar.bz2" "sha256-pXm2KMyMYDbDpX2r7Yniv/th3xrwEb3a5otdOpJ5pmw=";
+  at-spi2-atk = desktopSource "at-spi2-atk-0.4.0.tar.bz2" "sha256-LiMIzWf+JW4ICF5JmAj25BuNSWfZGDH/fyWVOJj8W0Y=";
+  libgail-gnome = desktopSource "libgail-gnome-1.20.3.tar.bz2" "sha256-lB9HzqrrtQj2YkdjkFHSMyhNk/P0KnYoSp+NHAugmiI=";
+  gstreamer = desktopSource "gstreamer-0.10.30.tar.bz2" "sha256-6O8wG+QjeX/zaguzYVkwsRK0F1Y0BR0Z/WVeDtl0Uyo=";
+  gst-plugins-base = desktopSource "gst-plugins-base-0.10.30.tar.bz2" "sha256-Y5OGQTgL6ZNcgEro1VrNz9k5IO0t63Lc9w8Ceniwhdc=";
+  gst-plugins-good = desktopSource "gst-plugins-good-0.10.25.tar.bz2" "sha256-tdV1DBJBLEfYW6k5HIQvbwLK2VEYdmleSLFfs35GmfY=";
+  gvfs = desktopSource "gvfs-1.6.4.tar.bz2" "sha256-4eKBBni0LLAWBkLwzTPM03fN37GPyGjW+qBMRJ+BNpM=";
 }

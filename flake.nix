@@ -10,6 +10,7 @@
       let
         gnome2 = import ./pkgs/gnome2 {
           inherit (pkgs)
+            atk
             bison
             buildEnv
             bzip2
@@ -43,6 +44,7 @@
             libXi
             libxklavier
             libXScrnSaver
+            libXtst
             libxrender
             libxres
             libxml2

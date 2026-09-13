@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  atk,
   bison,
   buildEnv,
   bzip2,
@@ -36,6 +37,7 @@
   libXi,
   libxklavier,
   libXScrnSaver,
+  libXtst,
   libxrender,
   libxres,
   pkg-config,
@@ -774,6 +776,76 @@ let
     };
   };
 
+  at-spi2-core = stdenv.mkDerivation rec {
+    pname = "at-spi2-core";
+    version = "0.4.0";
+
+    src = sources.at-spi2-core;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      dbus
+      dbus-glib
+      glib
+      libXi
+      libXtst
+      libx11
+    ];
+
+    configureFlags = [
+      "--with-dbus-daemondir=${dbus}/bin"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89 -fcommon";
+
+    meta = {
+      description = "Assistive Technology Service Provider Interface (D-Bus core)";
+      homepage = "https://download.gnome.org/sources/at-spi2-core/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  at-spi2-atk = stdenv.mkDerivation rec {
+    pname = "at-spi2-atk";
+    version = "0.4.0";
+
+    src = sources.at-spi2-atk;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      at-spi2-core
+      atk
+      dbus
+      dbus-glib
+      glib
+      gtk2
+    ];
+
+    env = {
+      GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL = "1";
+      NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-error=format-security -fcommon";
+    };
+
+    meta = {
+      description = "ATK to AT-SPI D-Bus accessibility bridge";
+      homepage = "https://download.gnome.org/sources/at-spi2-atk/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   vte = stdenv.mkDerivation rec {
     pname = "vte";
     version = "0.26.0";
@@ -1367,13 +1439,15 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity nautilus vte;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity nautilus vte;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
     paths = [
       GConf
       ORBit2
+      at-spi2-atk
+      at-spi2-core
       gnome-control-center
       gnome-desktop
       gnome-mime-data
