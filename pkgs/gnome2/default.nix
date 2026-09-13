@@ -132,6 +132,31 @@ let
       "--disable-scrollkeeper"
       "--with-console-kit=no"
       "--with-at-spi-registryd-directory=${at-spi2-core}/libexec"
+      # GDM_WORKING_DIR/GDM_XAUTH_DIR/GDM_SCREENSHOT_DIR/authdir/cachedir are
+      # all derived from --localstatedir and compiled in as fixed C string
+      # constants (no command-line override exists in gdm-binary itself --
+      # confirmed against daemon/main.c's GOptionEntry list). Left at the
+      # default, they'd point at $out/var/... : a read-only Nix store path,
+      # so gdm would crash immediately trying to write its X auth cookies.
+      # Configure against the real runtime location we want compiled in...
+      "--localstatedir=/var/lib/gnome2-gdm"
+    ];
+
+    # ...but redirect the actual `make install` file copies back into $out,
+    # so the build sandbox never touches a real /var path. The launch
+    # script creates the matching real directory at runtime. Most
+    # localstatedir-derived paths are live `$(localstatedir)/...` Makefile
+    # references (a plain recursive `=` assignment, so a command-line
+    # override cascades correctly), but GDM_WORKING_DIR/GDM_XAUTH_DIR/
+    # GDM_SCREENSHOT_DIR are pre-resolved into fixed strings by configure's
+    # own AC_SUBST and baked into Makefile.in as already-expanded values --
+    # overriding `localstatedir` alone doesn't touch those, so they need
+    # their own explicit overrides.
+    installFlags = [
+      "localstatedir=${placeholder "out"}/var/lib/gnome2-gdm"
+      "GDM_WORKING_DIR=${placeholder "out"}/var/lib/gnome2-gdm/lib/gdm"
+      "GDM_XAUTH_DIR=${placeholder "out"}/var/lib/gnome2-gdm/run/gdm"
+      "GDM_SCREENSHOT_DIR=${placeholder "out"}/var/lib/gnome2-gdm/run/gdm/greeter"
     ];
 
     nativeBuildInputs = [
