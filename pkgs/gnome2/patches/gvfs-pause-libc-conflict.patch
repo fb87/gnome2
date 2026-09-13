@@ -1,0 +1,25 @@
+--- a/metadata/meta-get-tree.c	2026-09-13 11:54:48.935851138 +0700
++++ b/metadata/meta-get-tree.c	2026-09-13 11:55:09.270495034 +0700
+@@ -4,11 +4,11 @@
+ 
+ /*static gboolean recursive = FALSE;*/
+ static gboolean verbose = FALSE;
+-static gboolean pause = FALSE;
++static gboolean opt_pause = FALSE;
+ static GOptionEntry entries[] =
+ {
+   { "verbose", 'l', 0, G_OPTION_ARG_NONE, &verbose, "Verbose", NULL },
+-  { "pause", 'p', 0, G_OPTION_ARG_NONE, &pause, "Pause", NULL },
++  { "pause", 'p', 0, G_OPTION_ARG_NONE, &opt_pause, "Pause", NULL },
+   { NULL }
+ };
+ 
+@@ -47,7 +47,7 @@
+       tree = meta_lookup_cache_lookup_path (cache, argv[i], statbuf.st_dev,
+ 					    FALSE, &tree_path);
+       g_print ("tree: %s (exists: %d), tree path: %s\n", meta_tree_get_filename (tree), meta_tree_exists (tree), tree_path);
+-      if (pause)
++      if (opt_pause)
+ 	{
+ 	  char buffer[1000];
+ 	  g_print ("Pausing, press enter\n");

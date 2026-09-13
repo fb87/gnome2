@@ -846,6 +846,39 @@ let
     };
   };
 
+  gvfs = stdenv.mkDerivation rec {
+    pname = "gvfs";
+    version = "1.6.4";
+
+    src = sources.gvfs;
+
+    patches = [ ./patches/gvfs-pause-libc-conflict.patch ];
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      dbus
+      dbus-glib
+      glib
+      gnome-keyring
+      libxml2
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 virtual filesystem infrastructure (successor to gnome-vfs)";
+      homepage = "https://download.gnome.org/sources/gvfs/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   vte = stdenv.mkDerivation rec {
     pname = "vte";
     version = "0.26.0";
@@ -1439,7 +1472,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity nautilus vte;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity nautilus vte;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -1463,6 +1496,7 @@ rec {
       gtkEngines
       gtksourceview
       gucharmap
+      gvfs
       libart_lgpl
       libbonobo
       libbonoboui
