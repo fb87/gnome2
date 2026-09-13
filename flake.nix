@@ -34,11 +34,14 @@
             iconnamingutils
             intltool
             lib
-            libcanberra
             libexif
+            lcms1
             libgcrypt
+            libgudev
             libICE
             libnotify
+            libtool
+            libvorbis
             librsvg
             libSM
             libstartup_notification
@@ -57,6 +60,8 @@
             libXtst
             libxrender
             libxres
+            libxrandr
+            libxxf86vm
             libxml2
             libxslt
             ncurses
@@ -66,6 +71,7 @@
             popt
             pkg-config
             poppler
+            sane-backends
             python3
             shared-mime-info
             stdenv

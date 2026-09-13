@@ -81,4 +81,12 @@ in
   totem-pl-parser = desktopSource "totem-pl-parser-2.32.0.tar.bz2" "sha256-LsQLyqHRpeU90MBRGsTVE5kIbXBwPUxbPpdfVkfB8e8=";
   nautilus-sendto = desktopSource "nautilus-sendto-2.32.0.tar.bz2" "sha256-iQCQskOB2R8HlhDVRUy3hqPs78kfoGZJsiIr6bsCJpo=";
   yelp = desktopSource "yelp-2.30.2.tar.bz2" "sha256-X4w1hHva5lTiHLumaGXWtYLZ/ICgWa0pCBu4fhRrsWU=";
+  gnome-color-manager = desktopSource "gnome-color-manager-2.32.0.tar.bz2" "sha256-+ih+8S0ylkPR8BuPNcKxBN0pPNMOkaAS8EkpwgPaVM8=";
+  # Not GNOME-hosted: libcanberra is Lennart Poettering's own project.
+  # Built locally with GTK2 support since nixpkgs' libcanberra in this
+  # snapshot only wires up a GTK3 module.
+  libcanberra = fetchurl {
+    url = "http://0pointer.de/lennart/projects/libcanberra/libcanberra-0.30.tar.xz";
+    hash = "sha256-wrZx5n4MKIpp/DPcG28bU00HiCwqzu03AEv0jGAa+nI=";
+  };
 }

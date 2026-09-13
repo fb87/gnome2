@@ -26,9 +26,10 @@
   gnomeDocUtils,
   iconnamingutils,
   intltool,
-  libcanberra,
+  lcms1,
   libexif,
   libgcrypt,
+  libgudev,
   libICE,
   libnotify,
   librsvg,
@@ -36,6 +37,8 @@
   libstartup_notification,
   libproxy,
   libtasn1,
+  libtool,
+  libvorbis,
   sqlite,
   ncurses,
   pango,
@@ -52,12 +55,15 @@
   libXtst,
   libxrender,
   libxres,
+  libxrandr,
+  libxxf86vm,
   pkg-config,
   libxml2,
   libxslt,
   perlPackages,
   poppler,
   popt,
+  sane-backends,
   python3,
   shared-mime-info,
   tzdata,
@@ -69,6 +75,47 @@
 
 let
   sources = import ./sources.nix { inherit fetchurl; };
+
+  # nixpkgs' own libcanberra in this snapshot only wires up a GTK3 module
+  # (gtkSupport = "gtk3"); several GTK2 apps need the GTK2 module
+  # (canberra-gtk.h / ca_gtk_context_get), so build it ourselves from the
+  # upstream tarball with --enable-gtk (auto-detected against our gtk2).
+  libcanberra = stdenv.mkDerivation rec {
+    pname = "libcanberra";
+    version = "0.30";
+
+    src = sources.libcanberra;
+
+    configureFlags = [
+      "--disable-alsa"
+      "--disable-oss"
+      "--disable-pulse"
+      "--disable-udev"
+      "--disable-gstreamer"
+      "--disable-gtk3"
+      "--disable-tdb"
+      "--disable-lynx"
+    ];
+
+    nativeBuildInputs = [
+      pkg-config
+    ];
+
+    buildInputs = [
+      glib
+      gtk2
+      libtool
+      libvorbis
+      libx11
+    ];
+
+    meta = {
+      description = "Implementation of the XDG Sound Theme and Name Specifications (GTK2 module)";
+      homepage = "http://0pointer.de/lennart/projects/libcanberra/";
+      license = lib.licenses.lgpl21Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
 
   gtkEngines = stdenv.mkDerivation rec {
     pname = "gtk-engines";
@@ -1510,6 +1557,56 @@ let
     };
   };
 
+  gnome-color-manager = stdenv.mkDerivation rec {
+    pname = "gnome-color-manager";
+    version = "2.32.0";
+
+    src = sources.gnome-color-manager;
+
+    postPatch = ''
+      sed -i '/^\thelp\t*\\$/d' Makefile.in
+      # libnotify 0.7 dropped notify_notification_new's trailing
+      # GtkWidget *attach argument.
+      substituteInPlace src/gcm-session.c \
+        --replace-fail \
+          'notify_notification_new (title, message, GCM_STOCK_ICON, NULL);' \
+          'notify_notification_new (title, message, GCM_STOCK_ICON);'
+    '';
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      dbus-glib
+      glib
+      gnome-desktop
+      gtk2
+      lcms1
+      libcanberra
+      libgudev
+      libnotify
+      libunique
+      libx11
+      libxrandr
+      libxxf86vm
+      sane-backends
+      vte
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-error=format-security -fcommon";
+
+    meta = {
+      description = "GNOME 2 color management/calibration utilities";
+      homepage = "https://download.gnome.org/sources/gnome-color-manager/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-utils = stdenv.mkDerivation rec {
     pname = "gnome-utils";
     version = "2.32.0";
@@ -2448,7 +2545,7 @@ fi' ':'
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-system-monitor gnome-utils gtkmm2 seahorse seahorse-plugins totem-pl-parser vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-color-manager gnome-system-monitor gnome-utils gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -2463,7 +2560,9 @@ rec {
       gnome-control-center
       gnome-desktop
       gnome-applets
+      gnome-color-manager
       gnome-utils
+      libcanberra
       gnome-mime-data
       gnome-menus
       gnome-netstatus
