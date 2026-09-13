@@ -68,5 +68,19 @@ exec "$GNOME2_CORE/bin/gnome-session"
 EOF
 chmod +x "$CLIENT_SCRIPT"
 
+# Xorg's built-in "modesetting" video driver needs no separate package
+# (which is why the display comes up fine on its own), but there is no
+# equivalent built-in input driver -- keyboard/mouse always go through a
+# separate xf86-input-* module. Left off ModulePath entirely, Xorg's
+# udev-based device autoconfig finds the devices but has no driver module
+# to bind them to, so it silently ends up with a display and no input at
+# all. Resolve the driver packages and hand Xorg their module dirs
+# directly via -modulepath, since a bare `nix shell` only extends $PATH,
+# not Xorg's own compiled-in module search path.
+XORG_SERVER="$(nix build nixpkgs#xorg-server --no-link --print-out-paths)"
+INPUT_LIBINPUT="$(nix build nixpkgs#xf86-input-libinput --no-link --print-out-paths)"
+INPUT_EVDEV="$(nix build nixpkgs#xf86-input-evdev --no-link --print-out-paths)"
+MODULE_PATH="$XORG_SERVER/lib/xorg/modules,$INPUT_LIBINPUT/lib/xorg/modules,$INPUT_EVDEV/lib/xorg/modules"
+
 exec nix shell nixpkgs#xinit nixpkgs#xorg-server -c \
-  startx "$CLIENT_SCRIPT" -- "$DISPLAY_NUM"
+  startx "$CLIENT_SCRIPT" -- "$DISPLAY_NUM" -modulepath "$MODULE_PATH"
