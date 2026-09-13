@@ -124,5 +124,19 @@ INPUT_LIBINPUT="$(nix build nixpkgs#xf86-input-libinput --no-link --print-out-pa
 INPUT_EVDEV="$(nix build nixpkgs#xf86-input-evdev --no-link --print-out-paths)"
 MODULE_PATH="$XORG_SERVER/lib/xorg/modules,$INPUT_LIBINPUT/lib/xorg/modules,$INPUT_EVDEV/lib/xorg/modules"
 
+# -modulepath alone isn't enough: udev correctly finds every input device
+# (confirmed in an Xorg log -- keyboard, trackpoint, etc. all show up as
+# "config/udev: Adding input device ..."), but each one then logs "No
+# input driver specified, ignoring this device". That's because the
+# InputClass rule that says "use the libinput driver for
+# keyboards/pointers/touchpads" isn't compiled into Xorg -- it's a config
+# snippet (40-libinput.conf) shipped *inside* xf86-input-libinput's own
+# share/X11/xorg.conf.d/, which Xorg only reads from its own compiled-in
+# default configdir, never from a separately-installed driver package.
+# -configdir points it at that snippet instead.
+CONFIG_DIR="$SESSION_HOME/xorg.conf.d"
+mkdir -p "$CONFIG_DIR"
+ln -sfn "$INPUT_LIBINPUT/share/X11/xorg.conf.d/40-libinput.conf" "$CONFIG_DIR/40-libinput.conf"
+
 exec nix shell nixpkgs#xinit nixpkgs#xorg-server -c \
-  startx "$CLIENT_SCRIPT" -- "$DISPLAY_NUM" -modulepath "$MODULE_PATH"
+  startx "$CLIENT_SCRIPT" -- "$DISPLAY_NUM" -modulepath "$MODULE_PATH" -configdir "$CONFIG_DIR"
