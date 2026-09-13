@@ -80,6 +80,7 @@
             tzdata
             upower
             which
+            xcursor-themes
             zenity
             zlib;
           # gnome-doc-utils installs its xml2po Python module under

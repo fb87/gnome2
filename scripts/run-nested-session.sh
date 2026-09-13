@@ -49,6 +49,11 @@ export PATH="$GNOME2_CORE/bin:$PATH"
 # paths, so GTK won't find the engines under its own compiled-in libdir;
 # GTK_PATH must point at the gtk-2.0 module tree explicitly.
 export GTK_PATH="$GNOME2_CORE/lib/gtk-2.0"
+# xcursor-themes ships whiteglass/redglass/handhelds under share/icons;
+# XCURSOR_PATH is how libXcursor finds them (there's no GConf/XSETTINGS
+# wiring for this without a running gnome-settings-daemon cursor plugin).
+export XCURSOR_PATH="$GNOME2_CORE/share/icons"
+export XCURSOR_THEME="whiteglass"
 mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME"
 
 echo "==> session HOME: $HOME" >&2
@@ -93,6 +98,12 @@ done
 
 echo "==> loading default panel layout" >&2
 "$GCT" --load "$GNOME2_CORE/etc/gconf/schemas/panel-default-setup.entries"
+
+echo "==> setting desktop background and cursor theme" >&2
+"$GCT" --set --type=string /desktop/gnome/background/picture_filename \
+  "$GNOME2_CORE/share/pixmaps/backgrounds/gnome/nature/Aqua.jpg"
+"$GCT" --set --type=string /desktop/gnome/background/picture_options "zoom"
+"$GCT" --set --type=string /desktop/gnome/peripherals/mouse/cursor_theme "whiteglass"
 
 echo "==> starting gnome-session" >&2
 "$GNOME2_CORE/bin/gnome-session" "$@"
