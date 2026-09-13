@@ -1557,6 +1557,63 @@ let
     };
   };
 
+  gnome-user-share = stdenv.mkDerivation rec {
+    pname = "gnome-user-share";
+    version = "2.30.1";
+
+    src = sources.gnome-user-share;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = data po src help" "SUBDIRS = data po src"
+      # notify_notification_new_with_status_icon() was removed from
+      # libnotify along with the GtkStatusIcon-attach mechanism; use the
+      # plain 3-arg constructor instead (matches the fix already applied
+      # to gnome-applets/gnome-color-manager/gnome-bluetooth call sites).
+      substituteInPlace src/obexpush.c \
+        --replace-fail \
+          'notification = notify_notification_new_with_status_icon (_("You received a file"),
+								 notification_text,
+								 "dialog-information",
+								 GTK_STATUS_ICON (statusicon));' \
+          'notification = notify_notification_new (_("You received a file"),
+								 notification_text,
+								 "dialog-information");'
+    '';
+
+    configureFlags = [
+      "--with-nautilusdir=\${out}/lib/nautilus/extensions-2.0"
+    ];
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      dbus
+      dbus-glib
+      glib
+      gnome-bluetooth
+      gtk2
+      libcanberra
+      libnotify
+      libunique
+      nautilus
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-error=format-security -fcommon";
+
+    meta = {
+      description = "GNOME 2 personal file sharing (WebDAV/Bluetooth OBEX) integration";
+      homepage = "https://download.gnome.org/sources/gnome-user-share/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-bluetooth = stdenv.mkDerivation rec {
     pname = "gnome-bluetooth";
     version = "2.32.0";
@@ -2620,7 +2677,7 @@ fi' ':'
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-bluetooth gnome-color-manager gnome-system-monitor gnome-utils gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-bluetooth gnome-color-manager gnome-system-monitor gnome-user-share gnome-utils gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -2637,6 +2694,7 @@ rec {
       gnome-applets
       gnome-bluetooth
       gnome-color-manager
+      gnome-user-share
       gnome-utils
       libcanberra
       gnome-mime-data
