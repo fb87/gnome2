@@ -24,6 +24,10 @@
             flex
             gettext
             glib
+            gmime
+            gnupg
+            gpgme
+            openssh
             gtk2
             iconnamingutils
             intltool
@@ -35,7 +39,9 @@
             librsvg
             libSM
             libstartup_notification
+            libproxy
             libtasn1
+            sqlite
             libx11
             libxcomposite
             libxcursor
@@ -60,7 +66,8 @@
             tzdata
             upower
             which
-            zenity;
+            zenity
+            zlib;
           gnomeDocUtils = pkgs.gnome-doc-utils;
         };
       in

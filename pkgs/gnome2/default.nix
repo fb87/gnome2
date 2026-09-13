@@ -15,6 +15,10 @@
   fontconfig,
   gettext,
   glib,
+  gmime,
+  gnupg,
+  gpgme,
+  openssh,
   gtk2,
   gnomeDocUtils,
   iconnamingutils,
@@ -26,7 +30,9 @@
   librsvg,
   libSM,
   libstartup_notification,
+  libproxy,
   libtasn1,
+  sqlite,
   ncurses,
   pango,
   libx11,
@@ -51,6 +57,7 @@
   upower,
   which,
   zenity,
+  zlib,
 }:
 
 let
@@ -1110,6 +1117,337 @@ let
     };
   };
 
+  file-roller = stdenv.mkDerivation rec {
+    pname = "file-roller";
+    version = "2.32.0";
+
+    src = sources.file-roller;
+
+    patches = [ ./patches/file-roller-glib-ptr-array-copy.patch ];
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = \\
+	copy-n-paste	\\
+	data		\\
+	src		\\
+	help		\\
+	\$(NAUTILUS)	\\
+	po" "SUBDIRS = \\
+	copy-n-paste	\\
+	data		\\
+	src		\\
+	\$(NAUTILUS)	\\
+	po"
+    '';
+
+    configureFlags = [
+      "--disable-nautilus-actions"
+    ];
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gtk2
+      libICE
+      libSM
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 archive manager";
+      homepage = "https://download.gnome.org/sources/file-roller/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  totem-pl-parser = stdenv.mkDerivation rec {
+    pname = "totem-pl-parser";
+    version = "2.32.0";
+
+    src = sources.totem-pl-parser;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      glib
+      gmime
+      libsoup
+      libxml2
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "Playlist parsing library used by Totem and other GNOME 2 media apps";
+      homepage = "https://download.gnome.org/sources/totem-pl-parser/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  nautilus-sendto = stdenv.mkDerivation rec {
+    pname = "nautilus-sendto";
+    version = "2.32.0";
+
+    src = sources.nautilus-sendto;
+
+    configureFlags = [
+      "--with-plugins=autodetect"
+      "--with-nautilusdir=\${out}/lib/nautilus/extensions-2.0"
+    ];
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      glib
+      gtk2
+      nautilus
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 nautilus 'Send To' context menu extension";
+      homepage = "https://download.gnome.org/sources/nautilus-sendto/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gedit = stdenv.mkDerivation rec {
+    pname = "gedit";
+    version = "2.30.4";
+
+    src = sources.gedit;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail '@OS_OSX_FALSE@am__append_1 = help' '@OS_OSX_FALSE@am__append_1 ='
+    '';
+
+    configureFlags = [
+      "--disable-python"
+      # Only enchant-2 (a different pkg-config name/API) is available;
+      # nixpkgs dropped the old enchant 1.x this configure.ac checks for.
+      "--disable-spell"
+    ];
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gtk2
+      gtksourceview
+      libICE
+      libSM
+      libx11
+      libxml2
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+      NIX_LDFLAGS = "-lgmodule-2.0 -lICE";
+    };
+
+    meta = {
+      description = "GNOME 2 text editor";
+      homepage = "https://download.gnome.org/sources/gedit/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  eog = stdenv.mkDerivation rec {
+    pname = "eog";
+    version = "2.32.0";
+
+    src = sources.eog;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail 'SUBDIRS = $(jpeg_DIRS) cut-n-paste bindings src plugins po help data doc' \
+                        'SUBDIRS = $(jpeg_DIRS) cut-n-paste bindings src plugins po data doc'
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gnome-desktop
+      gnome-icon-theme
+      gtk2
+      libICE
+      libSM
+      libexif
+      librsvg
+      libx11
+      libxml2
+      shared-mime-info
+      zlib
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+      NIX_LDFLAGS = "-lgmodule-2.0 -lICE -lm";
+    };
+
+    meta = {
+      description = "GNOME 2 image viewer";
+      homepage = "https://download.gnome.org/sources/eog/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  seahorse = stdenv.mkDerivation rec {
+    pname = "seahorse";
+    version = "2.32.0";
+
+    src = sources.seahorse;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "\$(SSH_DIR) \\
+	src \\
+	po \\
+	data \\
+	help \\" \
+                        "\$(SSH_DIR) \\
+	src \\
+	po \\
+	data \\"
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      gnupg
+      gpgme
+      intltool
+      openssh
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      dbus-glib
+      glib
+      gnome-keyring
+      gpgme
+      gtk2
+      libSM
+      libgnome-keyring
+      libsoup
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+      NIX_LDFLAGS = "-lgmodule-2.0";
+    };
+
+    meta = {
+      description = "GNOME 2 GPG/SSH key manager";
+      homepage = "https://download.gnome.org/sources/seahorse/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  seahorse-plugins = stdenv.mkDerivation rec {
+    pname = "seahorse-plugins";
+    version = "2.30.1";
+
+    src = sources.seahorse-plugins;
+
+    postPatch = ''
+      sed -i '/^          help \\$/d' Makefile.in
+      # configure only recognizes GnuPG 1.2/1.4/2.0 by major.minor; modern
+      # GnuPG (2.4.x here) works fine with this codebase, the version list
+      # is just stale.
+      substituteInPlace configure \
+        --replace-fail 'accepted_versions="1.2 1.4 2.0"' 'accepted_versions="1.2 1.4 2.0 2.2 2.4"'
+      # The GPGME version check requires an exact major-version match
+      # ("$major" -eq "$req_major"), so it rejects any GPGME 2.x since it
+      # only knows about 1.0.0 as the minimum. Pin the minimum to the
+      # actual major.minor.micro of the GPGME we're building against.
+      substituteInPlace configure \
+        --replace-fail 'min_gpgme_version=1.0.0' 'min_gpgme_version=${gpgme.version}'
+      # GPGME 2.x dropped "trust items" entirely, so this event code no
+      # longer exists; the switch case was only ever a no-op placeholder.
+      sed -i '/case GPGME_EVENT_NEXT_TRUSTITEM:/d' libseahorse/seahorse-pgp-operation.c
+    '';
+
+    configureFlags = [ "--with-nautilus-ext-dir=\${out}/lib/nautilus/extensions-2.0" ];
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      gnupg
+      gpgme
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+      shared-mime-info
+    ];
+
+    buildInputs = [
+      GConf
+      dbus-glib
+      glib
+      gnome-panel
+      gpgme
+      gtk2
+      libgnome-keyring
+      nautilus
+      seahorse
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 seahorse Nautilus/panel/agent integration plugins";
+      homepage = "https://download.gnome.org/sources/seahorse-plugins/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   mousetweaks = stdenv.mkDerivation rec {
     pname = "mousetweaks";
     version = "2.32.0";
@@ -1435,13 +1773,16 @@ let
     ];
 
     buildInputs = [
+      GConf
       glib
+      libgnome-keyring
+      libproxy
       libxml2
+      sqlite
     ];
 
     configureFlags = [
       "--disable-ssl"
-      "--without-gnome"
     ];
 
     env.NIX_CFLAGS_COMPILE = "-std=gnu89";
@@ -1765,7 +2106,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog gedit seahorse seahorse-plugins totem-pl-parser vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -1815,7 +2156,15 @@ rec {
       libwnck
       metacity
       nautilus
+      nautilus-sendto
       vte
+      eog
+      file-roller
+      gedit
+      gtkBuilderConvert
+      seahorse
+      seahorse-plugins
+      totem-pl-parser
     ];
   };
 }

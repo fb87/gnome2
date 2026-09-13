@@ -68,4 +68,14 @@ in
   gok = desktopSource "gok-2.30.1.tar.bz2" "sha256-ZCLe24DCyz1e5HI4Inlg3A5t3g0NE1HMfRHeBgicNsA=";
   mousetweaks = desktopSource "mousetweaks-2.32.0.tar.bz2" "sha256-h05m3Af1+gp6MqMq5WuzR+71hD11yUpjy0rTlC+bUEc=";
   zenity = desktopSource "zenity-2.32.0.tar.bz2" "sha256-kXUWdqAZQuxEV4YiXlzMHEug7TDTO4sXfhzbAUtOOu8=";
+  eog = desktopSource "eog-2.32.0.tar.bz2" "sha256-cKTrdTrPRFuj8Hv1nRzK1nmxxApzxW8CxN9RZeM2wto=";
+  evince = desktopSource "evince-2.32.0.tar.bz2" "sha256-KkyRrjj4tQKM67kbnandxQ6orj89Qp34m6NR2i14f/c=";
+  file-roller = desktopSource "file-roller-2.32.0.tar.bz2" "sha256-m9EUYAMH7jEiYKEO67LwopeY3C81aaaM67X0VmZWOOc=";
+  gedit = desktopSource "gedit-2.30.4.tar.bz2" "sha256-pWH+PdHRmbrt4b0HxO5l8G/HxJTdTTMnEX8EFJpgjjw=";
+  gnome-system-monitor = desktopSource "gnome-system-monitor-2.28.2.tar.bz2" "sha256-tijt/TnjprN0zhM/Nn01aEdetOmBo2f0+dYql4Tlrlk=";
+  seahorse = desktopSource "seahorse-2.32.0.tar.bz2" "sha256-9VRoI3JGpIUxfVni+8Gx719b1MWnuf9vQMPZIa8O1S0=";
+  seahorse-plugins = desktopSource "seahorse-plugins-2.30.1.tar.bz2" "sha256-H9/tGu8sIqKamrwA6uZ3UoVORmpmzuKowcJ4J36DLWY=";
+  totem-pl-parser = desktopSource "totem-pl-parser-2.32.0.tar.bz2" "sha256-LsQLyqHRpeU90MBRGsTVE5kIbXBwPUxbPpdfVkfB8e8=";
+  nautilus-sendto = desktopSource "nautilus-sendto-2.32.0.tar.bz2" "sha256-iQCQskOB2R8HlhDVRUy3hqPs78kfoGZJsiIr6bsCJpo=";
+  yelp = desktopSource "yelp-2.30.2.tar.bz2" "sha256-X4w1hHva5lTiHLumaGXWtYLZ/ICgWa0pCBu4fhRrsWU=";
 }

@@ -1,0 +1,35 @@
+--- a/src/glib-utils.h	2026-09-13 12:50:55.077078496 +0700
++++ b/src/glib-utils.h	2026-09-13 12:51:01.635533389 +0700
+@@ -59,7 +59,6 @@
+ 						  int          last_field);
+ int                 n_fields                     (char       **str_array);
+ char *              get_time_string              (time_t       time);
+-GPtrArray *         g_ptr_array_copy             (GPtrArray   *array);
+ void                g_ptr_array_free_full        (GPtrArray   *array,
+                        				  GFunc        func,
+                        				  gpointer     user_data);
+--- a/src/glib-utils.c	2026-09-13 12:50:55.081432639 +0700
++++ b/src/glib-utils.c	2026-09-13 12:51:08.906645044 +0700
+@@ -542,22 +542,6 @@
+ }
+ 
+ 
+-GPtrArray *
+-g_ptr_array_copy (GPtrArray *array)
+-{
+-	GPtrArray *new_array;
+-	
+-	if (array == NULL)
+-		return NULL;
+-		
+-	new_array = g_ptr_array_sized_new (array->len);
+-	memcpy (new_array->pdata, array->pdata, array->len * sizeof (gpointer)); 
+-	new_array->len = array->len;
+-	
+-	return new_array;
+-}
+-
+-
+ void
+ g_ptr_array_free_full (GPtrArray *array,
+                        GFunc      free_func,
