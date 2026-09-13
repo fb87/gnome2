@@ -32,6 +32,7 @@
   libgcrypt,
   libjpeg,
   libgudev,
+  linux-pam,
   libICE,
   libnotify,
   librsvg,
@@ -46,6 +47,7 @@
   pango,
   pangomm,
   libx11,
+  libxau,
   libxcomposite,
   libxcursor,
   libxdamage,
@@ -116,6 +118,57 @@ let
       description = "Implementation of the XDG Sound Theme and Name Specifications (GTK2 module)";
       homepage = "http://0pointer.de/lennart/projects/libcanberra/";
       license = lib.licenses.lgpl21Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gdm = stdenv.mkDerivation rec {
+    pname = "gdm";
+    version = "2.32.0";
+
+    src = sources.gdm;
+
+    configureFlags = [
+      "--disable-scrollkeeper"
+      "--with-console-kit=no"
+      "--with-at-spi-registryd-directory=${at-spi2-core}/libexec"
+    ];
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      libxslt
+      pkg-config
+      which
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      dbus-glib
+      fontconfig
+      glib
+      gnome-panel
+      gtk2
+      libart_lgpl
+      libbonobo
+      libbonoboui
+      libcanberra
+      libgnome
+      libgnomecanvas
+      libx11
+      libxau
+      libxklavier
+      linux-pam
+      popt
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-error=format-security -fcommon";
+
+    meta = {
+      description = "GNOME 2 display manager (login screen / session launcher)";
+      homepage = "https://download.gnome.org/sources/gdm/";
+      license = lib.licenses.gpl2Plus;
       platforms = lib.platforms.linux;
     };
   };
@@ -2865,7 +2918,7 @@ fi' ':'
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-backgrounds gnome-control-center gnome-desktop gnome-icon-theme gnome-icon-theme-symbolic gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-bluetooth gnome-color-manager gnome-system-monitor gnome-user-share gnome-utils gtk-vnc gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vinagre vino vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gdm gnome-backgrounds gnome-control-center gnome-desktop gnome-icon-theme gnome-icon-theme-symbolic gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-bluetooth gnome-color-manager gnome-system-monitor gnome-user-share gnome-utils gtk-vnc gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vinagre vino vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -2896,6 +2949,7 @@ rec {
       gnome-session
       gnome-settings-daemon
       gnome-vfs
+      gdm
       gnome-backgrounds
       gnome-icon-theme
       gnome-icon-theme-symbolic

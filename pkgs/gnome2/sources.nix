@@ -88,6 +88,7 @@ in
   vinagre = desktopSource "vinagre-2.30.3.tar.bz2" "sha256-KL/HCoFrw/HnGtqC4mDDnuLaxpPLeFkyOwbIsUUqOfQ=";
   gnome-backgrounds = desktopSource "gnome-backgrounds-2.32.0.tar.bz2" "sha256-TXtgtbp2i/iDS1+jo0cc2anhS1iEvCENwtPNvx+t3O8=";
   gnome-icon-theme-symbolic = desktopSource "gnome-icon-theme-symbolic-2.31.0.tar.bz2" "sha256-X6Ao5yY+Fe9YqyGWMwO+zW7NYyHD4+Vwgg+kNCAxkb0=";
+  gdm = desktopSource "gdm-2.32.0.tar.bz2" "sha256-9HrNGe0Q1vuzfD4rVPWzkscCDbZ/cds/dVZ+rTCrL6Q=";
   # nixpkgs' gtk-vnc dropped GTK2/autotools entirely (meson-only, GTK3
   # hardcoded); vinagre needs the old gtk-vnc-1.0 (GTK2) API, so build the
   # last GTK2-capable release from source ourselves.

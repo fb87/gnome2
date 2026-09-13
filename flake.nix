@@ -40,6 +40,7 @@
             libgcrypt
             libjpeg
             libgudev
+            linux-pam
             libICE
             libnotify
             libtool
@@ -51,6 +52,7 @@
             libtasn1
             sqlite
             libx11
+            libxau
             libxcomposite
             libxcursor
             libxdamage
