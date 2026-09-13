@@ -84,6 +84,12 @@ in
   gnome-color-manager = desktopSource "gnome-color-manager-2.32.0.tar.bz2" "sha256-+ih+8S0ylkPR8BuPNcKxBN0pPNMOkaAS8EkpwgPaVM8=";
   gnome-bluetooth = desktopSource "gnome-bluetooth-2.32.0.tar.bz2" "sha256-V7HwbJahuF4cGf+RnXCMw46V7a5liIHtmZaMMlg5qXM=";
   gnome-user-share = desktopSource "gnome-user-share-2.30.1.tar.bz2" "sha256-MLoHQgpJVFD4C0vgAWARUEU93DUE/yPEhv0VQf9aG/4=";
+  vino = desktopSource "vino-2.32.0.tar.bz2" "sha256-AERvUusDiTvp1p2tuziZtYZ2wSLzPbZw9G3Bnkp9PW0=";
+  vinagre = desktopSource "vinagre-2.30.3.tar.bz2" "sha256-KL/HCoFrw/HnGtqC4mDDnuLaxpPLeFkyOwbIsUUqOfQ=";
+  # nixpkgs' gtk-vnc dropped GTK2/autotools entirely (meson-only, GTK3
+  # hardcoded); vinagre needs the old gtk-vnc-1.0 (GTK2) API, so build the
+  # last GTK2-capable release from source ourselves.
+  gtk-vnc = gnomeSource "gtk-vnc" "0.6" "gtk-vnc-0.6.0.tar.xz" "sha256-lVk0iAXmTRMNrlaf7kZpMBddvhUNJkm7hotcCV8TBDM=";
   # Not GNOME-hosted: libcanberra is Lennart Poettering's own project.
   # Built locally with GTK2 support since nixpkgs' libcanberra in this
   # snapshot only wires up a GTK3 module.

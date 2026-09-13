@@ -20,6 +20,7 @@
   glibmm,
   gmime,
   gnupg,
+  gnutls,
   gpgme,
   openssh,
   gtk2,
@@ -29,6 +30,7 @@
   lcms1,
   libexif,
   libgcrypt,
+  libjpeg,
   libgudev,
   libICE,
   libnotify,
@@ -1557,6 +1559,152 @@ let
     };
   };
 
+  gtk-vnc = stdenv.mkDerivation rec {
+    pname = "gtk-vnc";
+    version = "0.6.0";
+
+    src = sources.gtk-vnc;
+
+    configureFlags = [
+      "--with-gtk=2.0"
+      "--without-sasl"
+      "--without-pulseaudio"
+      "--without-libview"
+      "--without-python"
+    ];
+
+    nativeBuildInputs = [
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      gtk2
+      gnutls
+      libgcrypt
+      libx11
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu99 -Wno-error=format-security -fcommon";
+
+    meta = {
+      description = "GTK2 VNC client widget (last GTK2-capable release; nixpkgs' is GTK3/meson-only)";
+      homepage = "https://download.gnome.org/sources/gtk-vnc/";
+      license = lib.licenses.lgpl21Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  vinagre = stdenv.mkDerivation rec {
+    pname = "vinagre";
+    version = "2.30.3";
+
+    src = sources.vinagre;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = vinagre help po data plugins plugin-loaders" \
+          "SUBDIRS = vinagre po data plugins plugin-loaders"
+    '';
+
+    configureFlags = [
+      "--disable-ssh"
+      "--disable-avahi"
+    ];
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      dbus-glib
+      glib
+      gnome-panel
+      gtk-vnc
+      gtk2
+      libart_lgpl
+      libbonobo
+      libbonoboui
+      libgnome
+      libgnomecanvas
+      libgnome-keyring
+      libx11
+      libxml2
+      popt
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-error=format-security -fcommon";
+      NIX_LDFLAGS = "-lgmodule-2.0";
+    };
+
+    meta = {
+      description = "GNOME 2 VNC/RDP/SSH remote desktop client";
+      homepage = "https://download.gnome.org/sources/vinagre/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  vino = stdenv.mkDerivation rec {
+    pname = "vino";
+    version = "2.32.0";
+
+    src = sources.vino;
+
+    postPatch = ''
+      # notify_notification_new_with_status_icon() was removed from
+      # libnotify along with the GtkStatusIcon-attach mechanism (same fix
+      # as gnome-user-share's obexpush.c).
+      perl -0777 -pi -e \
+        's/notify_notification_new_with_status_icon \(summary,\s*\n\s*body,\s*\n\s*"preferences-desktop-remote-desktop",\s*\n\s*GTK_STATUS_ICON \(icon\)\);/notify_notification_new (summary,\n                                              body,\n                                              "preferences-desktop-remote-desktop");/' \
+        server/vino-status-icon.c
+    '';
+
+    configureFlags = [
+      # The vendored libvncserver/auth.c TLS code targets GnuTLS's old
+      # (pre-2.12) key-exchange priority API, which no longer exists in
+      # modern GnuTLS; VNC's own auth is already the weak link here, so
+      # skip TLS rather than patch the vendored library's API usage.
+      "--disable-gnutls"
+    ];
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      dbus
+      dbus-glib
+      glib
+      gtk2
+      libgnome-keyring
+      libICE
+      libjpeg
+      libnotify
+      libunique
+      libsoup
+      libSM
+      zlib
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-error=format-security -fcommon";
+
+    meta = {
+      description = "GNOME 2 VNC server (screen/remote-desktop sharing)";
+      homepage = "https://download.gnome.org/sources/vino/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-user-share = stdenv.mkDerivation rec {
     pname = "gnome-user-share";
     version = "2.30.1";
@@ -2677,7 +2825,7 @@ fi' ':'
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-bluetooth gnome-color-manager gnome-system-monitor gnome-user-share gnome-utils gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-bluetooth gnome-color-manager gnome-system-monitor gnome-user-share gnome-utils gtk-vnc gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vinagre vino vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -2695,6 +2843,9 @@ rec {
       gnome-bluetooth
       gnome-color-manager
       gnome-user-share
+      gtk-vnc
+      vinagre
+      vino
       gnome-utils
       libcanberra
       gnome-mime-data

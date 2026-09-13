@@ -28,6 +28,7 @@
             glibmm
             gmime
             gnupg
+            gnutls
             gpgme
             openssh
             gtk2
@@ -37,6 +38,7 @@
             libexif
             lcms1
             libgcrypt
+            libjpeg
             libgudev
             libICE
             libnotify
