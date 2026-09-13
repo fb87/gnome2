@@ -36,6 +36,17 @@ HOST_DISPLAY="${GNOME2_HOST_DISPLAY:-${DISPLAY:-:0}}"
 
 mkdir -p "$SESSION_HOME"
 export HOME="$SESSION_HOME"
+# gnome-control-center's theme scanner (capplets/common/gnome-theme-info.c)
+# finds GTK+ widget themes via gtk_rc_get_theme_dir() -- hardcoded to plain
+# gtk2's own compiled-in share/themes -- plus ~/.themes, never consulting
+# XDG_DATA_DIRS. Icon themes are scanned via gtk_icon_theme_get_search_path()
+# instead, which nominally does respect XDG_DATA_DIRS, but empirically the
+# icon theme still wasn't found without also symlinking ~/.icons. Without
+# both, Appearance Preferences reports "GTK+ theme 'Clearlooks'" and/or
+# "icon theme 'gnome'" as "not installed", even though both are present
+# and actually rendering correctly.
+ln -sfn "$GNOME2_CORE/share/themes" "$HOME/.themes"
+ln -sfn "$GNOME2_CORE/share/icons" "$HOME/.icons"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_DIRS="$GNOME2_CORE/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
