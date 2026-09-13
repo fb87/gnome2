@@ -11,6 +11,7 @@
         gnome2 = import ./pkgs/gnome2 {
           inherit (pkgs)
             atk
+            atkmm
             bison
             buildEnv
             bzip2
@@ -24,6 +25,7 @@
             flex
             gettext
             glib
+            glibmm
             gmime
             gnupg
             gpgme
@@ -57,6 +59,7 @@
             libxml2
             ncurses
             pango
+            pangomm
             perlPackages
             popt
             pkg-config
@@ -70,6 +73,7 @@
             zenity
             zlib;
           gnomeDocUtils = pkgs.gnome-doc-utils;
+          cairomm = pkgs.cairomm_1_0;
         };
       in
       gnome2 // {

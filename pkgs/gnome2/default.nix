@@ -3,9 +3,11 @@
   stdenv,
   fetchurl,
   atk,
+  atkmm,
   bison,
   buildEnv,
   bzip2,
+  cairomm,
   coreutils,
   dbus,
   dbus-glib,
@@ -15,6 +17,7 @@
   fontconfig,
   gettext,
   glib,
+  glibmm,
   gmime,
   gnupg,
   gpgme,
@@ -35,6 +38,7 @@
   sqlite,
   ncurses,
   pango,
+  pangomm,
   libx11,
   libxcomposite,
   libxcursor,
@@ -1504,6 +1508,87 @@ let
     };
   };
 
+  gtkmm2 = stdenv.mkDerivation rec {
+    pname = "gtkmm";
+    version = "2.24.5";
+
+    src = sources.gtkmm2;
+
+    nativeBuildInputs = [
+      pkg-config
+    ];
+
+    buildInputs = [
+      atkmm
+      cairomm
+      glibmm
+      gtk2
+      pangomm
+    ];
+
+    meta = {
+      description = "C++ bindings for GTK+ 2 (gtkmm-2.4)";
+      homepage = "https://download.gnome.org/sources/gtkmm/";
+      license = lib.licenses.lgpl21Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gnome-system-monitor = stdenv.mkDerivation rec {
+    pname = "gnome-system-monitor";
+    version = "2.28.2";
+
+    src = sources.gnome-system-monitor;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = pixmaps po src help" "SUBDIRS = pixmaps po src"
+      # C++11 added rvalue-reference operator<< overloads for ostream, so a
+      # temporary ostringstream's operator<< result no longer statically
+      # converts back to ostringstream& the way this pre-C++11-era code
+      # assumed; build the string in two steps instead.
+      substituteInPlace src/lsof.cpp \
+        --replace-fail \
+          'string s = static_cast<std::ostringstream&>(std::ostringstream() << count).str();' \
+          'std::ostringstream ss; ss << count; string s = ss.str();'
+    '';
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      atkmm
+      cairomm
+      dbus-glib
+      glib
+      glibmm
+      gnome-icon-theme
+      gtk2
+      gtkmm2
+      libgtop
+      librsvg
+      libwnck
+      libxml2
+      pangomm
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu++11";
+      NIX_LDFLAGS = "-lgmodule-2.0";
+    };
+
+    meta = {
+      description = "GNOME 2 process/resource/file-system monitor";
+      homepage = "https://download.gnome.org/sources/gnome-system-monitor/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   mousetweaks = stdenv.mkDerivation rec {
     pname = "mousetweaks";
     version = "2.32.0";
@@ -2162,7 +2247,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit seahorse seahorse-plugins totem-pl-parser vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-system-monitor gtkmm2 seahorse seahorse-plugins totem-pl-parser vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -2218,7 +2303,9 @@ rec {
       evince
       file-roller
       gedit
+      gnome-system-monitor
       gtkBuilderConvert
+      gtkmm2
       seahorse
       seahorse-plugins
       totem-pl-parser
