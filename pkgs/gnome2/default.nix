@@ -50,6 +50,7 @@
   pkg-config,
   libxml2,
   perlPackages,
+  poppler,
   popt,
   python3,
   shared-mime-info,
@@ -1448,6 +1449,61 @@ let
     };
   };
 
+  evince = stdenv.mkDerivation rec {
+    pname = "evince";
+    version = "2.32.0";
+
+    src = sources.evince;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "properties shell po help \$(am__append_1)" "properties shell po \$(am__append_1)"
+    '';
+
+    configureFlags = [
+      "--with-gtk=2.0"
+      "--disable-introspection"
+      "--disable-scrollkeeper"
+      # nautilus's extensiondir is baked into evince's own $out install path
+      # with no way to override it from configure, and points into
+      # nautilus's own (read-only) store path; skip the integration plugin.
+      "--disable-nautilus"
+    ];
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      pkg-config
+      which
+    ];
+
+    buildInputs = [
+      GConf
+      dbus
+      dbus-glib
+      glib
+      gnome-icon-theme
+      gtk2
+      libgnome-keyring
+      libICE
+      libSM
+      libxml2
+      poppler
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+      NIX_LDFLAGS = "-lgmodule-2.0 -lICE";
+    };
+
+    meta = {
+      description = "GNOME 2 document (PDF/PostScript) viewer";
+      homepage = "https://download.gnome.org/sources/evince/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   mousetweaks = stdenv.mkDerivation rec {
     pname = "mousetweaks";
     version = "2.32.0";
@@ -2106,7 +2162,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog gedit seahorse seahorse-plugins totem-pl-parser vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit seahorse seahorse-plugins totem-pl-parser vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -2159,6 +2215,7 @@ rec {
       nautilus-sendto
       vte
       eog
+      evince
       file-roller
       gedit
       gtkBuilderConvert

@@ -60,6 +60,7 @@
             perlPackages
             popt
             pkg-config
+            poppler
             python3
             shared-mime-info
             stdenv
