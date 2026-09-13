@@ -15,6 +15,7 @@ let
 in
 {
   GConf = gnomeSource "GConf" "2.32" "GConf-2.32.0.tar.bz2" "sha256-VN0d1/SZKKnMQldL727wSBdTdw/BmYbcIAS7t/rJd6A=";
+  gnome-applets = desktopSource "gnome-applets-2.32.0.tar.bz2" "sha256-OyYRsyU+1UGPN8g9cQkY6TR2p4NjfdtO9+Xqt6g6TBs=";
   gnome-desktop = desktopSource "gnome-desktop-2.32.0.tar.bz2" "sha256-ZtenjmEtmmV47N/aeqjBgMx2wDKgNN+E90KUSiCQPiU=";
   gnome-menus = desktopSource "gnome-menus-2.30.4.tar.bz2" "sha256-MXl9c8k+xPMILYRHxsK23CkAnEpPOscHWZnDh9xLDJ4=";
   gnome-panel = desktopSource "gnome-panel-2.32.0.2.tar.bz2" "sha256-BWP+szzqLgVa6DcJruNnOXikvqShDvTQXgCvF4Zwkjg=";

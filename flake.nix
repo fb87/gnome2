@@ -38,6 +38,7 @@
             libexif
             libgcrypt
             libICE
+            libnotify
             librsvg
             libSM
             libstartup_notification
@@ -57,6 +58,7 @@
             libxrender
             libxres
             libxml2
+            libxslt
             ncurses
             pango
             pangomm
@@ -72,7 +74,17 @@
             which
             zenity
             zlib;
-          gnomeDocUtils = pkgs.gnome-doc-utils;
+          # gnome-doc-utils installs its xml2po Python module under
+          # lib/python3.1/site-packages (a stale hardcoded version string
+          # from its own build scripts) but the xml2po wrapper never adds
+          # that directory to PYTHONPATH, so `from xml2po import Main`
+          # fails for every consumer's help/docs translation step.
+          gnomeDocUtils = pkgs.gnome-doc-utils.overrideAttrs (old: {
+            postFixup = (old.postFixup or "") + ''
+              wrapProgram $out/bin/xml2po \
+                --prefix PYTHONPATH : $out/lib/python3.1/site-packages
+            '';
+          });
           cairomm = pkgs.cairomm_1_0;
         };
       in

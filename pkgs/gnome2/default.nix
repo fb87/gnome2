@@ -30,6 +30,7 @@
   libexif,
   libgcrypt,
   libICE,
+  libnotify,
   librsvg,
   libSM,
   libstartup_notification,
@@ -53,6 +54,7 @@
   libxres,
   pkg-config,
   libxml2,
+  libxslt,
   perlPackages,
   poppler,
   popt,
@@ -1508,6 +1510,116 @@ let
     };
   };
 
+  gnome-applets = stdenv.mkDerivation rec {
+    pname = "gnome-applets";
+    version = "2.32.0";
+
+    src = sources.gnome-applets;
+
+    configureFlags = [
+      # setuid-root install of cpufreq-selector isn't possible (and isn't
+      # meaningful) inside the Nix build sandbox.
+      "--disable-suid"
+    ];
+
+    postPatch = ''
+      # scrollkeeper is a long-dead docs indexer with no modern equivalent
+      # packaged; SCROLLKEEPER_CONFIG is only ever AC_SUBST'd, never used to
+      # build or link anything, so the hard failure here is safe to drop.
+      # (The generated error message is also malformed -- an unquoted,
+      # space-containing AC_MSG_ERROR argument confuses as_fn_error's
+      # arg parsing -- an upstream autoconf-generation bug independent of
+      # the scrollkeeper check itself.)
+      substituteInPlace configure \
+        --replace-fail 'if test x$SCROLLKEEPER_CONFIG = xno; then
+  as_fn_error please install the Scrollkeeper 0.1.4 package "Couldn'"'"'t find scrollkeeper-config" "$LINENO" 5
+fi' ':'
+      # Per-applet docs/help dirs go through gnome-doc-utils' OMF metadata
+      # generation, which shells out to the real scrollkeeper-config tool
+      # (long dead upstream, no modern nixpkgs equivalent) to locate a
+      # Templates/scrollkeeper_cl.xml file used by the OMF stylesheet; drop
+      # each applet's docs/help subdir rather than stub out scrollkeeper.
+      substituteInPlace charpick/Makefile.in gswitchit/Makefile.in drivemount/Makefile.in \
+        --replace-fail "SUBDIRS = help" "SUBDIRS ="
+      substituteInPlace mixer/Makefile.in gweather/Makefile.in multiload/Makefile.in \
+        --replace-fail "SUBDIRS = docs" "SUBDIRS ="
+      substituteInPlace trashapplet/Makefile.in \
+        --replace-fail "SUBDIRS = src docs" "SUBDIRS = src"
+      substituteInPlace geyes/Makefile.in \
+        --replace-fail "SUBDIRS = themes docs" "SUBDIRS = themes"
+      substituteInPlace stickynotes/Makefile.in \
+        --replace-fail "SUBDIRS = pixmaps docs data" "SUBDIRS = pixmaps data"
+      substituteInPlace mini-commander/Makefile.in \
+        --replace-fail "SUBDIRS = src help" "SUBDIRS = src"
+      substituteInPlace cpufreq/Makefile.in \
+        --replace-fail "SUBDIRS = help pixmaps src" "SUBDIRS = pixmaps src"
+      substituteInPlace battstat/Makefile.in \
+        --replace-fail 'SUBDIRS = docs sounds $(APMDIR)' 'SUBDIRS = sounds $(APMDIR)'
+      substituteInPlace accessx-status/Makefile.in \
+        --replace-fail "SUBDIRS = docs pixmaps" "SUBDIRS = pixmaps"
+      substituteInPlace invest-applet/Makefile.in \
+        --replace-fail "SUBDIRS = invest data docs" "SUBDIRS = invest data"
+      # libnotify 0.7 dropped notify_notification_new's trailing
+      # GtkWidget *attach argument; drop it at the two call sites.
+      substituteInPlace battstat/battstat_applet.c \
+        --replace-fail \
+          'notify_notification_new (_("Your battery is now fully recharged"), "", /* "battery" */ NULL, applet);' \
+          'notify_notification_new (_("Your battery is now fully recharged"), "", /* "battery" */ NULL);'
+      substituteInPlace gweather/gweather-applet.c \
+        --replace-fail \
+          'n = notify_notification_new (message, detail, icon,
+					 gw_applet->container);' \
+          'n = notify_notification_new (message, detail, icon);'
+    '';
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      libxslt
+      pkg-config
+      which
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      dbus
+      dbus-glib
+      glib
+      gnome-desktop
+      gnome-icon-theme
+      gnome-panel
+      gnome-settings-daemon
+      gtk2
+      libart_lgpl
+      libbonobo
+      libbonoboui
+      libgnome
+      libgnomecanvas
+      libgtop
+      libgweather
+      libICE
+      libnotify
+      libSM
+      libwnck
+      libxml2
+      libxklavier
+      popt
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89 -fcommon";
+      NIX_LDFLAGS = "-lm -lX11";
+    };
+
+    meta = {
+      description = "GNOME 2 desktop panel applets";
+      homepage = "https://download.gnome.org/sources/gnome-applets/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gtkmm2 = stdenv.mkDerivation rec {
     pname = "gtkmm";
     version = "2.24.5";
@@ -2247,7 +2359,7 @@ let
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-system-monitor gtkmm2 seahorse seahorse-plugins totem-pl-parser vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-system-monitor gtkmm2 seahorse seahorse-plugins totem-pl-parser vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -2261,6 +2373,7 @@ rec {
       gconf-editor
       gnome-control-center
       gnome-desktop
+      gnome-applets
       gnome-mime-data
       gnome-menus
       gnome-netstatus
