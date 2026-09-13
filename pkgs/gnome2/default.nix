@@ -2856,6 +2856,19 @@ fi' ':'
       "--disable-update-mimedb"
     ];
 
+    # configure hardcodes GTK_ENGINE_DIR to plain gtk2's own libdir
+    # (`pkg-config --variable libdir gtk+-2.0`), baked in via -D as a
+    # compile-time C string. Since our engines (Clearlooks etc.) live in
+    # the separately-packaged gtkEngines derivation, not in gtk2's own
+    # store path, the Appearance capplet's engine-presence check always
+    # reports themes as "not installed" even though GTK_PATH makes them
+    # load and render fine at runtime. Override the Makefile variable
+    # (recursive `=` assignment, so a command-line override wins) to
+    # point the diagnostic at where the engines actually are.
+    makeFlags = [
+      "GTK_ENGINE_DIR=${gtkEngines}/lib/gtk-2.0/2.10.0/engines"
+    ];
+
     env = {
       GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL = "1";
       NIX_CFLAGS_COMPILE = "-std=gnu89";
