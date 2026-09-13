@@ -1510,6 +1510,95 @@ let
     };
   };
 
+  gnome-utils = stdenv.mkDerivation rec {
+    pname = "gnome-utils";
+    version = "2.32.0";
+
+    src = sources.gnome-utils;
+
+    postPatch = ''
+      substituteInPlace configure \
+        --replace-fail \
+          'as_fn_error "Couldn'"'"'t find scrollkeeper-config. Please install the scrollkeeper package" "$LINENO" 5' \
+          ':'
+      substituteInPlace baobab/Makefile.in \
+        --replace-fail "SUBDIRS = src data pixmaps help" "SUBDIRS = src data pixmaps"
+      substituteInPlace logview/Makefile.in \
+        --replace-fail "SUBDIRS = data help tests" "SUBDIRS = data tests"
+      substituteInPlace gsearchtool/Makefile.in \
+        --replace-fail "SUBDIRS = data help libgnomeui-deprecated" "SUBDIRS = data libgnomeui-deprecated"
+      substituteInPlace gnome-dictionary/Makefile.in \
+        --replace-fail "SUBDIRS = libgdict src data docs help" "SUBDIRS = libgdict src data"
+      # nixpkgs' libcanberra in this snapshot only wires up a GTK3 module
+      # (gtkSupport = "gtk3"), so libcanberra-gtk.pc (the GTK2 ABI this
+      # package needs) doesn't exist. gnome-screenshot only uses the GTK
+      # wrapper for ca_gtk_context_get(), a thin convenience helper around
+      # plain ca_context_create()/ca_context_open(); use the core
+      # (non-GTK) libcanberra API and pkg-config module instead.
+      substituteInPlace configure \
+        --replace-fail "libcanberra-gtk >= \$LIBCANBERRA_GTK_REQUIRED" "libcanberra >= \$LIBCANBERRA_GTK_REQUIRED"
+      substituteInPlace gnome-screenshot/gnome-screenshot.c \
+        --replace-fail "#include <canberra-gtk.h>" "#include <canberra.h>" \
+        --replace-fail "c = ca_gtk_context_get ();" \
+          "ca_context_create (&c); ca_context_open (c);"
+      # gdict-client-context.h uses the GdictContext type in its own
+      # prototypes without including the header that defines it; only ever
+      # worked because every prior consumer happened to include
+      # gdict-context.h first through some other path.
+      substituteInPlace gnome-dictionary/libgdict/gdict-client-context.h \
+        --replace-fail '#include <glib-object.h>' \
+          '#include <glib-object.h>
+#include "gdict-context.h"'
+      # gsearchtool's libgnomeui-deprecated subdir vendors a subclass of
+      # the deprecated GtkComboBoxEntry widget, but its own Makefile
+      # disables deprecated GTK API for that exact compilation, which
+      # hides the very type it subclasses.
+      substituteInPlace gsearchtool/libgnomeui-deprecated/Makefile.in \
+        --replace-fail 'INCLUDES = -DGTK_DISABLE_DEPRECATED \
+           -DGDK_DISABLE_DEPRECATED \
+           -DG_DISABLE_DEPRECATED' \
+          'INCLUDES ='
+    '';
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      pkg-config
+      which
+    ];
+
+    buildInputs = [
+      GConf
+      ORBit2
+      dbus-glib
+      glib
+      gnome-icon-theme
+      gnome-panel
+      gtk2
+      libSM
+      libart_lgpl
+      libbonobo
+      libbonoboui
+      libcanberra
+      libgnome
+      libgnomecanvas
+      libgnomeui
+      libgtop
+      libx11
+      libxext
+      popt
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-error=format-security -fcommon";
+
+    meta = {
+      description = "GNOME 2 utilities: baobab, gnome-dictionary, gnome-screenshot, gsearchtool, logview";
+      homepage = "https://download.gnome.org/sources/gnome-utils/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-applets = stdenv.mkDerivation rec {
     pname = "gnome-applets";
     version = "2.32.0";
@@ -2359,7 +2448,7 @@ fi' ':'
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-system-monitor gtkmm2 seahorse seahorse-plugins totem-pl-parser vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-system-monitor gnome-utils gtkmm2 seahorse seahorse-plugins totem-pl-parser vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -2374,6 +2463,7 @@ rec {
       gnome-control-center
       gnome-desktop
       gnome-applets
+      gnome-utils
       gnome-mime-data
       gnome-menus
       gnome-netstatus
