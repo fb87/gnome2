@@ -12,13 +12,55 @@
 #   e.g. scripts/start-gnome-session.sh :1
 #
 # Env overrides:
-#   GNOME2_CORE          path to a pre-built gnome2-core (skips nix build)
-#   GNOME2_SESSION_HOME  HOME dir for the session (default: fresh temp dir)
+#   GNOME2_CORE               path to a pre-built gnome2-core (skips nix build)
+#   GNOME2_SESSION_HOME       HOME dir for the session (default: fresh temp dir)
+#   GNOME2_FIX_INPUT_GROUP=1  auto-add yourself to the "input" group if you're
+#                             not in it (see the preflight check below) --
+#                             needs sudo, and still needs a fresh login shell
+#                             (via `newgrp input` or logging out/in) to apply
 
 set -euo pipefail
 
 FLAKE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DISPLAY_NUM="${1:-:1}"
+
+# --- preflight: input device permissions --------------------------------
+# On most distros /dev/input/event* is mode 0660, owned root:input -- only
+# root or the "input" group can read/write it. A real login through a
+# display manager gets this via a logind/udev seat ACL automatically; a
+# bare `startx` from a tty doesn't. This is what "display works, keyboard
+# and mouse don't" almost always means (Xorg's own "modesetting" video
+# driver needs no such permission, so the display comes up regardless).
+if [ "$(id -u)" -ne 0 ] && ! id -nG | tr ' ' '\n' | grep -qx input; then
+  if [ "${GNOME2_FIX_INPUT_GROUP:-0}" = "1" ]; then
+    echo "==> adding $(id -un) to the 'input' group (GNOME2_FIX_INPUT_GROUP=1)" >&2
+    sudo usermod -aG input "$(id -un)"
+    cat >&2 <<'EOF'
+
+Added -- but group membership is read once at login, so this shell still
+doesn't have it. Run:
+
+  newgrp input
+
+then re-run this script from the shell that prints (or just log out and
+back in), and keyboard/mouse should work.
+EOF
+    exit 1
+  else
+    cat >&2 <<'EOF'
+No keyboard or mouse input will work: you're not root and not in the
+"input" group, so Xorg won't be able to open /dev/input/event* even once
+it finds a driver for them (this is separate from the driver itself,
+which this script already handles via -modulepath). Either:
+
+  sudo usermod -aG input $(whoami) && newgrp input
+
+then re-run this script from that same shell, or re-run with
+GNOME2_FIX_INPUT_GROUP=1 to have this script run the usermod for you.
+EOF
+    exit 1
+  fi
+fi
 
 GNOME2_CORE="${GNOME2_CORE:-}"
 if [ -z "$GNOME2_CORE" ]; then
