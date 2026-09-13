@@ -40,4 +40,15 @@ in
   nautilus = desktopSource "nautilus-2.32.0.tar.bz2" "sha256-B5y0vIxa/AEqzFSxf5G3Zz3NPjkWIkEpsVqB6rVT8ZI=";
   ORBit2 = gnomeSource "ORBit2" "2.14" "ORBit2-2.14.19.tar.bz2" "sha256-VckAqQVIKZJzD1dfPu801QvacXwZfJfAj6Wm6v2FdVA=";
   gnome-icon-theme = desktopSource "gnome-icon-theme-2.31.0.tar.bz2" "sha256-6n4Ft36tFZN5OSs7J1ygycus19k2AU5EfMfF4np2eYI=";
+  gnome-control-center = desktopSource "gnome-control-center-2.32.0.tar.bz2" "sha256-17CefgczPai0aKGyr3pkzRLhvyvVDFfiwA5MMGQvEC8=";
+  gtk-engines = desktopSource "gtk-engines-2.20.1.tar.bz2" "sha256-xQLuR3jhqOIy9DD7V1FGoIgCZkcdGdvXjuUeqnadphQ=";
+  gnome-terminal = desktopSource "gnome-terminal-2.32.0.tar.bz2" "sha256-Pp+SK+pK9/AWtm8yBCZsiZNYLFGhL2z9zkdgcgJAByU=";
+  gnome-themes = desktopSource "gnome-themes-2.32.0.tar.bz2" "sha256-gtvNPiwxfbi3Pr2Bp6foTnZNcjULUanfHX3dfWXR+xs=";
+  vte = desktopSource "vte-0.26.0.tar.bz2" "sha256-Cx6co3f4CRLZ+5osLYdsj934sLf+C9Fp2AZxr+b0fk0=";
+  gnome-keyring = desktopSource "gnome-keyring-2.32.0.tar.bz2" "sha256-1A+DZnrBea5bgQLQftceTTn8h+JxhFw5kqTNejJoZKo=";
+  gtksourceview = desktopSource "gtksourceview-2.10.5.tar.bz2" "sha256-xYV3N0Ox34oEsb5/fZDuzfImgUkNaBC+VMgaeuFSGR4=";
+  gucharmap = desktopSource "gucharmap-2.32.0.tar.bz2" "sha256-sHnZwDM4JjiOwYfzxJQaObjQT4HMksVyqTv0ZJBfvNk=";
+  libgnomeprint = desktopSource "libgnomeprint-2.18.8.tar.bz2" "sha256-EDTshlEFH4TSQk56HaYcUwQizCDOWy2eEH4eRneNlpE=";
+  libgnomeprintui = desktopSource "libgnomeprintui-2.18.6.tar.bz2" "sha256-FWrltm5dzFRu+iRJBI95LXbFWzDZOptnsMaWZeNG9Go=";
+  libgtop = desktopSource "libgtop-2.28.2.tar.bz2" "sha256-SZWNfaH3ayV7/Q1VfY7Sshilqw0xtZ/tHDLd8qFSn10=";
 }

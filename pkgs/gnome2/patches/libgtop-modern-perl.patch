@@ -1,0 +1,44 @@
+--- a/lib/lib.pl	2026-09-13 08:44:47.756276523 +0700
++++ b/lib/lib.pl	2026-09-13 08:45:30.575288572 +0700
+@@ -1,6 +1,10 @@
+ #!/usr/bin/perl
+ 
+-$[ = 1;			# set array base to 1
++# Array base used to be set to 1 here via "$[ = 1", a legacy feature
++# removed by modern perl. Instead, split()-derived arrays below are
++# padded with a leading dummy element so the existing 1-based indices
++# ($line_fields[1], $params[$param], $fields[$field], ...) still line
++# up with the real data.
+ $, = ' ';		# set output field separator
+ $\ = "\n";		# set output record separator
+ 
+@@ -86,6 +90,7 @@
+ sub output {
+     local($line) = @_;
+     @line_fields = split(/\|/, $line, 9999);
++    unshift(@line_fields, undef);
+     $retval = $line_fields[1];
+     $feature = $line_fields[2];
+     $param_def = $line_fields[4];
+@@ -124,7 +129,9 @@
+ 	$send_ptr = '';
+ 	$param_buf = '';
+ 	$buf_set = '';
+-	$nr_params = (@params = split(/:/, $param_def, 9999));
++	@params = split(/:/, $param_def, 9999);
++	$nr_params = @params;
++	unshift(@params, undef);
+ 	if ($nr_params) {
+ 	    $param_buf = "\n\tstruct {\n";
+ 	}
+@@ -134,7 +141,9 @@
+ 	    $type =~ s/\(.*//;
+ 	    $list =~ s/^.*\(//;
+ 	    $list =~ s/\)$//;
+-	    $count = (@fields = split(/,/, $list, 9999));
++	    @fields = split(/,/, $list, 9999);
++	    $count = @fields;
++	    unshift(@fields, undef);
+ 
+ 	    if ($count > 0) {
+ 		for ($field = 1; $field <= $count; $field++) {

@@ -14,8 +14,11 @@
             buildEnv
             bzip2
             coreutils
+            dbus
             dbus-glib
+            desktop-file-utils
             fetchurl
+            fontconfig
             flex
             gettext
             glib
@@ -30,16 +33,21 @@
             librsvg
             libSM
             libstartup_notification
+            libtasn1
             libx11
             libxcomposite
             libxcursor
             libxdamage
             libxext
             libxfixes
+            libXi
             libxklavier
+            libXScrnSaver
             libxrender
             libxres
             libxml2
+            ncurses
+            pango
             perlPackages
             popt
             pkg-config

@@ -10,10 +10,6 @@
 #     /apps/panel/default_setup on its very first run; that tree must be
 #     loaded before gnome-session starts the panel, or you get one empty
 #     auto-generated panel instead of the real top/bottom layout.
-#   - metacity's schema default theme is "Clearlooks", which isn't packaged
-#     (no gnome-themes derivation yet), so it's pinned to "Atlanta", a theme
-#     metacity ships itself.
-#
 # Usage: scripts/run-nested-session.sh [gnome-session args...]
 #
 # Env overrides:
@@ -44,6 +40,10 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_DIRS="$GNOME2_CORE/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export PATH="$GNOME2_CORE/bin:$PATH"
+# gtk2 and the gtk-engines package (Clearlooks etc.) are separate store
+# paths, so GTK won't find the engines under its own compiled-in libdir;
+# GTK_PATH must point at the gtk-2.0 module tree explicitly.
+export GTK_PATH="$GNOME2_CORE/lib/gtk-2.0"
 mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME"
 
 echo "==> session HOME: $HOME" >&2
@@ -85,8 +85,6 @@ echo "==> installing GConf schema defaults" >&2
 for f in "$GNOME2_CORE"/etc/gconf/schemas/*.schemas; do
   "$GCT" --install-schema-file="$f" >/dev/null
 done
-
-"$GCT" --type string --set /apps/metacity/general/theme Atlanta
 
 echo "==> loading default panel layout" >&2
 "$GCT" --load "$GNOME2_CORE/etc/gconf/schemas/panel-default-setup.entries"

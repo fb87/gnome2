@@ -6,8 +6,11 @@
   buildEnv,
   bzip2,
   coreutils,
+  dbus,
   dbus-glib,
+  desktop-file-utils,
   flex,
+  fontconfig,
   gettext,
   glib,
   gtk2,
@@ -21,13 +24,18 @@
   librsvg,
   libSM,
   libstartup_notification,
+  libtasn1,
+  ncurses,
+  pango,
   libx11,
   libxcomposite,
   libxcursor,
   libxdamage,
   libxext,
   libxfixes,
+  libXi,
   libxklavier,
+  libXScrnSaver,
   libxrender,
   libxres,
   pkg-config,
@@ -44,6 +52,29 @@
 
 let
   sources = import ./sources.nix { inherit fetchurl; };
+
+  gtkEngines = stdenv.mkDerivation rec {
+    pname = "gtk-engines";
+    version = "2.20.1";
+
+    src = sources.gtk-engines;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [ gtk2 ];
+
+    meta = {
+      description = "Theme engines for GTK 2, including Clearlooks";
+      homepage = "https://download.gnome.org/sources/gtk-engines/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
 
   libIDL = stdenv.mkDerivation rec {
     pname = "libIDL";
@@ -271,6 +302,46 @@ let
     };
   };
 
+  libgnomeprint = stdenv.mkDerivation rec {
+    pname = "libgnomeprint";
+    version = "2.18.8";
+
+    src = sources.libgnomeprint;
+
+    patches = [ ./patches/libgnomeprint-modern-bison.patch ];
+
+    nativeBuildInputs = [
+      bison
+      flex
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      fontconfig
+      glib
+      libart_lgpl
+      libxml2
+      pango
+    ];
+
+    configureFlags = [
+      "--without-cups"
+      "--without-papi"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 printing support library";
+      homepage = "https://download.gnome.org/sources/libgnomeprint/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   libgnomecanvas = stdenv.mkDerivation rec {
     pname = "libgnomecanvas";
     version = "2.30.3";
@@ -295,6 +366,40 @@ let
     meta = {
       description = "Canvas widget library for GNOME 2";
       homepage = "https://download.gnome.org/sources/libgnomecanvas/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  libgnomeprintui = stdenv.mkDerivation rec {
+    pname = "libgnomeprintui";
+    version = "2.18.6";
+
+    src = sources.libgnomeprintui;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      fontconfig
+      gnome-icon-theme
+      gtk2
+      libart_lgpl
+      libgnomecanvas
+      libgnomeprint
+      libxml2
+      pango
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 printing UI library";
+      homepage = "https://download.gnome.org/sources/libgnomeprintui/";
       license = lib.licenses.lgpl2Plus;
       platforms = lib.platforms.linux;
     };
@@ -526,6 +631,208 @@ let
     meta = {
       description = "GNOME 2 window navigator construction kit";
       homepage = "https://download.gnome.org/sources/libwnck/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gtksourceview = stdenv.mkDerivation rec {
+    pname = "gtksourceview";
+    version = "2.10.5";
+
+    src = sources.gtksourceview;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      glib
+      gtk2
+      libxml2
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "Source code editing widget for GTK 2, used by gedit";
+      homepage = "https://download.gnome.org/sources/gtksourceview/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gucharmap = stdenv.mkDerivation rec {
+    pname = "gucharmap";
+    version = "2.32.0";
+
+    src = sources.gucharmap;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "@ENABLE_CHARMAP_TRUE@@HAVE_GNOME_DOC_UTILS_TRUE@am__append_2 = help" \
+                        "@ENABLE_CHARMAP_TRUE@@HAVE_GNOME_DOC_UTILS_TRUE@am__append_2 ="
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+      which
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gtk2
+    ];
+
+    configureFlags = [
+      "--disable-python-bindings"
+      "--disable-introspection"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "GNOME 2 Unicode character map application";
+      homepage = "https://download.gnome.org/sources/gucharmap/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  libgtop = stdenv.mkDerivation rec {
+    pname = "libgtop";
+    version = "2.28.2";
+
+    src = sources.libgtop;
+
+    patches = [ ./patches/libgtop-modern-perl.patch ];
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [ glib ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "System usage/statistics library, used by gnome-system-monitor and panel applets";
+      homepage = "https://download.gnome.org/sources/libgtop/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  gnome-keyring = stdenv.mkDerivation rec {
+    pname = "gnome-keyring";
+    version = "2.32.0";
+
+    src = sources.gnome-keyring;
+
+    patches = [ ./patches/gnome-keyring-modern-libtasn1.patch ];
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+    ];
+
+    buildInputs = [
+      dbus
+      glib
+      gtk2
+      libgcrypt
+      libtasn1
+    ];
+
+    configureFlags = [
+      "--disable-pam"
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+      NIX_LDFLAGS = "-lgio-2.0";
+    };
+
+    meta = {
+      description = "GNOME 2 keyring daemon (secrets, SSH agent, GPG agent)";
+      homepage = "https://download.gnome.org/sources/gnome-keyring/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  vte = stdenv.mkDerivation rec {
+    pname = "vte";
+    version = "0.26.0";
+
+    src = sources.vte;
+
+    nativeBuildInputs = [
+      gettext
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      glib
+      gtk2
+      ncurses
+    ];
+
+    configureFlags = [
+      "--disable-python"
+      "--disable-gnome-pty-helper"
+      "--disable-gtk-doc"
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89";
+
+    meta = {
+      description = "Terminal emulator widget for GTK 2";
+      homepage = "https://download.gnome.org/sources/vte/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  # GTK 2's own build tool for converting libglade .glade files to
+  # GtkBuilder .ui files. It shipped in the gtk+ source tree itself but
+  # current nixpkgs no longer installs it, and gnome-terminal's build still
+  # needs it, so pull the one script out of the same gtk2 source tarball
+  # nixpkgs already fetches for gtk2 rather than adding a new source.
+  gtkBuilderConvert = stdenv.mkDerivation {
+    pname = "gtk-builder-convert";
+    version = gtk2.version;
+
+    src = gtk2.src;
+
+    nativeBuildInputs = [ python3 ];
+
+    dontConfigure = true;
+    dontBuild = true;
+
+    installPhase = ''
+      mkdir -p $out/bin
+      install -m755 gtk/gtk-builder-convert $out/bin/gtk-builder-convert
+      patchShebangs $out/bin/gtk-builder-convert
+    '';
+
+    meta = {
+      description = "Converts libglade .glade files to GtkBuilder .ui files";
+      homepage = "https://gitlab.gnome.org/GNOME/gtk";
       license = lib.licenses.lgpl2Plus;
       platforms = lib.platforms.linux;
     };
@@ -833,6 +1140,49 @@ let
     };
   };
 
+  gnome-terminal = stdenv.mkDerivation rec {
+    pname = "gnome-terminal";
+    version = "2.32.0";
+
+    src = sources.gnome-terminal;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = src po help" "SUBDIRS = src po"
+    '';
+
+    nativeBuildInputs = [
+      gettext
+      gnomeDocUtils
+      gtkBuilderConvert
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+      which
+    ];
+
+    buildInputs = [
+      GConf
+      glib
+      gtk2
+      libICE
+      libSM
+      vte
+    ];
+
+    env = {
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+      NIX_LDFLAGS = "-lICE";
+    };
+
+    meta = {
+      description = "GNOME 2 terminal emulator application";
+      homepage = "https://download.gnome.org/sources/gnome-terminal/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-settings-daemon = stdenv.mkDerivation rec {
     pname = "gnome-settings-daemon";
     version = "2.32.0";
@@ -906,6 +1256,69 @@ let
     };
   };
 
+  gnome-control-center = stdenv.mkDerivation rec {
+    pname = "gnome-control-center";
+    version = "2.32.0";
+
+    src = sources.gnome-control-center;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = po libwindow-settings capplets font-viewer help \\" \
+                        "SUBDIRS = po libwindow-settings capplets font-viewer \\"
+    '';
+
+    nativeBuildInputs = [
+      desktop-file-utils
+      gettext
+      gnomeDocUtils
+      intltool
+      perlPackages.XMLParser
+      pkg-config
+      shared-mime-info
+      which
+    ];
+
+    buildInputs = [
+      GConf
+      dbus
+      dbus-glib
+      glib
+      gnome-desktop
+      gnome-menus
+      gnome-settings-daemon
+      gtk2
+      libSM
+      libXScrnSaver
+      libXi
+      libcanberra
+      libgnomekbd
+      libunique
+      libxcursor
+      libxklavier
+      libxml2
+      libx11
+      metacity
+    ];
+
+    configureFlags = [
+      "--disable-update-mimedb"
+    ];
+
+    env = {
+      GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL = "1";
+      NIX_CFLAGS_COMPILE = "-std=gnu89";
+      NIX_LDFLAGS = "-lgmodule-2.0";
+    };
+
+    meta = {
+      description = "GNOME 2 control center and preference capplets";
+      homepage = "https://download.gnome.org/sources/gnome-control-center/";
+      license = lib.licenses.gpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-icon-theme = stdenv.mkDerivation rec {
     pname = "gnome-icon-theme";
     version = "2.31.0";
@@ -926,15 +1339,42 @@ let
       platforms = lib.platforms.linux;
     };
   };
+
+  gnome-themes = stdenv.mkDerivation rec {
+    pname = "gnome-themes";
+    version = "2.32.0";
+
+    src = sources.gnome-themes;
+
+    nativeBuildInputs = [
+      gettext
+      iconnamingutils
+      intltool
+      pkg-config
+    ];
+
+    buildInputs = [
+      gtk2
+      gtkEngines
+    ];
+
+    meta = {
+      description = "GNOME 2 GTK, metacity and icon themes";
+      homepage = "https://download.gnome.org/sources/gnome-themes/";
+      license = lib.licenses.lgpl2Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
 in
 rec {
-  inherit GConf ORBit2 gnome-desktop gnome-icon-theme gnome-menus gnome-mime-data gnome-panel gnome-session gnome-settings-daemon gnome-vfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeui libgweather libsoup libunique libwnck metacity nautilus;
+  inherit GConf ORBit2 gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity nautilus vte;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
     paths = [
       GConf
       ORBit2
+      gnome-control-center
       gnome-desktop
       gnome-mime-data
       gnome-menus
@@ -943,6 +1383,12 @@ rec {
       gnome-settings-daemon
       gnome-vfs
       gnome-icon-theme
+      gnome-keyring
+      gnome-terminal
+      gnome-themes
+      gtkEngines
+      gtksourceview
+      gucharmap
       libart_lgpl
       libbonobo
       libbonoboui
@@ -951,13 +1397,17 @@ rec {
       libgnome-keyring
       libgnomecanvas
       libgnomekbd
+      libgnomeprint
+      libgnomeprintui
       libgnomeui
+      libgtop
       libgweather
       libsoup
       libunique
       libwnck
       metacity
       nautilus
+      vte
     ];
   };
 }

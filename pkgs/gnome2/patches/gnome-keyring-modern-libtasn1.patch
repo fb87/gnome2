@@ -1,0 +1,23 @@
+--- a/egg/egg-asn1x.c	2010-09-28 03:51:51.000000000 +0700
++++ b/egg/egg-asn1x.c	2026-09-13 08:48:49.996272392 +0700
+@@ -47,10 +47,18 @@
+ 
+ #include "config.h"
+ 
+-#include "egg-asn1x.h"
+-
++/*
++ * libtasn1.h must be included before egg-asn1x.h: it #defines the
++ * deprecated ASN1_ARRAY_TYPE/static_struct_asn names to the modern
++ * asn1_static_node(_st) type, and egg-asn1x.h's forward declaration
++ * of "struct static_struct_asn" needs that macro already visible to
++ * expand to the same struct tag used here, or the two end up as
++ * distinct, conflicting types.
++ */
+ #include <libtasn1.h>
+ 
++#include "egg-asn1x.h"
++
+ #include <stdlib.h>
+ #include <string.h>
+ 
