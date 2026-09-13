@@ -39,6 +39,11 @@ export HOME="$SESSION_HOME"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_DIRS="$GNOME2_CORE/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+# gnome-menus' applications.menu lives under $GNOME2_CORE/etc/xdg/menus;
+# without this, gnome-panel's main menu applet only sees the host's
+# ambient XDG_CONFIG_DIRS (or the "/etc/xdg" spec default) and never
+# finds it, so the Applications menu renders empty.
+export XDG_CONFIG_DIRS="$GNOME2_CORE/etc/xdg:${XDG_CONFIG_DIRS:-/etc/xdg}"
 export PATH="$GNOME2_CORE/bin:$PATH"
 # gtk2 and the gtk-engines package (Clearlooks etc.) are separate store
 # paths, so GTK won't find the engines under its own compiled-in libdir;
