@@ -7,12 +7,17 @@
 # This is a materially more invasive operation than the other two
 # scripts: it needs root, a writable runtime state directory (gdm's
 # PID/auth/working/cache paths are compiled-in constants -- see the gdm
-# derivation's comment in pkgs/gnome2/default.nix), a "gdm" system user
-# for the greeter to run as, and a real /etc/pam.d/gdm on the host (PAM
-# is a system library; it always reads there, there's no per-app way to
-# point it elsewhere). This script checks for all of that and tells you
-# exactly what's missing rather than silently working around it -- the
-# PAM file in particular it will only write if you explicitly opt in.
+# derivation's comment in pkgs/gnome2/default.nix), and a real
+# /etc/pam.d/gdm on the host (PAM is a system library; it always reads
+# there, there's no per-app way to point it elsewhere). This script
+# checks for that and tells you exactly what's missing rather than
+# silently working around it -- the PAM file in particular it will only
+# write if you explicitly opt in.
+#
+# gdm is built with --with-user=root/--with-group=root (see the gdm
+# derivation), so the greeter runs as root instead of gdm's normal
+# dedicated unprivileged user -- that's what removes the need for a
+# separate system account here, at the cost of that isolation.
 #
 # Run this from an actual virtual console (switch away from any existing
 # graphical session first -- Ctrl+Alt+F<n> on most setups), as root:
@@ -49,21 +54,6 @@ echo "==> gdm: $GDM_OUT" >&2
 
 # --- preflight checks ---------------------------------------------------
 
-if ! id gdm >/dev/null 2>&1; then
-  cat >&2 <<'EOF'
-
-No "gdm" system user exists. gdm-binary is compiled with GDM_USERNAME
-"gdm" (the upstream default) and drops the greeter process to that user
-for privilege separation -- this script won't create system accounts on
-its own. Create one first, e.g.:
-
-  useradd --system --home-dir /var/lib/gnome2-gdm --shell /usr/sbin/nologin gdm
-
-then re-run this script.
-EOF
-  exit 1
-fi
-
 PAM_STACK='#%PAM-1.0
 auth       required     pam_unix.so
 account    required     pam_unix.so
@@ -95,12 +85,13 @@ fi
 # gdm-binary's PID/auth/working/screenshot/cache paths are compiled-in C
 # string constants pointing under $STATE_DIR (a real host path chosen at
 # build time -- see pkgs/gnome2/default.nix). Nothing here is optional;
-# gdm will fail to write its X auth cookies without it.
+# gdm will fail to write its X auth cookies without it. No chown needed
+# since everything (daemon and greeter both) now runs as root, which is
+# also who's creating these directories.
 mkdir -p /var/log/gdm /var/run
 for sub in gdm lib/gdm run/gdm run/gdm/greeter cache/gdm; do
   mkdir -p "$STATE_DIR/$sub"
 done
-chown -R gdm:gdm "$STATE_DIR" /var/log/gdm 2>/dev/null || true
 
 # --- session entry -------------------------------------------------
 # The greeter's session list (gui/simple-greeter/gdm-sessions.c) scans a

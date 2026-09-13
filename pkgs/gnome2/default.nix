@@ -140,6 +140,17 @@ let
       # so gdm would crash immediately trying to write its X auth cookies.
       # Configure against the real runtime location we want compiled in...
       "--localstatedir=/var/lib/gnome2-gdm"
+      # GDM_USERNAME/GDM_GROUPNAME are likewise compiled-in constants (no
+      # runtime override in gdm-binary) -- gdm normally drops the greeter
+      # process to a dedicated unprivileged "gdm" user for privilege
+      # separation, which means that account has to exist on the host
+      # before gdm can run at all. Pointing this at "root" (which always
+      # exists, on every system) removes that setup step entirely, at the
+      # cost of the greeter running as root instead of a separate
+      # unprivileged user -- an accepted trade-off for a personal/test
+      # setup, not something to carry into a real multi-user deployment.
+      "--with-user=root"
+      "--with-group=root"
     ];
 
     # ...but redirect the actual `make install` file copies back into $out,
