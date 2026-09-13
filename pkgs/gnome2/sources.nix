@@ -82,6 +82,7 @@ in
   nautilus-sendto = desktopSource "nautilus-sendto-2.32.0.tar.bz2" "sha256-iQCQskOB2R8HlhDVRUy3hqPs78kfoGZJsiIr6bsCJpo=";
   yelp = desktopSource "yelp-2.30.2.tar.bz2" "sha256-X4w1hHva5lTiHLumaGXWtYLZ/ICgWa0pCBu4fhRrsWU=";
   gnome-color-manager = desktopSource "gnome-color-manager-2.32.0.tar.bz2" "sha256-+ih+8S0ylkPR8BuPNcKxBN0pPNMOkaAS8EkpwgPaVM8=";
+  gnome-bluetooth = desktopSource "gnome-bluetooth-2.32.0.tar.bz2" "sha256-V7HwbJahuF4cGf+RnXCMw46V7a5liIHtmZaMMlg5qXM=";
   # Not GNOME-hosted: libcanberra is Lennart Poettering's own project.
   # Built locally with GTK2 support since nixpkgs' libcanberra in this
   # snapshot only wires up a GTK3 module.

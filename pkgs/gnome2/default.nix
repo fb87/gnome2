@@ -1557,6 +1557,81 @@ let
     };
   };
 
+  gnome-bluetooth = stdenv.mkDerivation rec {
+    pname = "gnome-bluetooth";
+    version = "2.32.0";
+
+    src = sources.gnome-bluetooth;
+
+    postPatch = ''
+      substituteInPlace Makefile.in \
+        --replace-fail "SUBDIRS = icons lib applet properties wizard sendto \$(MOBLIN_DIR) docs po help" \
+          "SUBDIRS = icons lib applet properties wizard sendto \$(MOBLIN_DIR) docs po"
+      # These <interface name="..."> values are only used by
+      # dbus-binding-tool to derive generated C stub function names; the
+      # real wire D-Bus interface strings (org.bluez.Manager etc.) are
+      # hardcoded separately in bluetooth-client.c. Modern dbus-glib
+      # rejects un-namespaced interface names outright, so give them a
+      # (cosmetic-only) namespace.
+      substituteInPlace lib/bluetooth-client.xml \
+        --replace-fail 'interface name="manager"' 'interface name="gnomebt.manager"' \
+        --replace-fail 'interface name="adapter"' 'interface name="gnomebt.adapter"' \
+        --replace-fail 'interface name="device"' 'interface name="gnomebt.device"'
+      # dbus-binding-tool derives its generated C function names from the
+      # full dotted interface name, so namespacing it above changes the
+      # sync call wrappers from e.g. manager_list_adapters() to
+      # gnomebt_manager_list_adapters(); update the call sites to match.
+      substituteInPlace lib/bluetooth-client.c \
+        --replace-fail 'device_get_properties(device, &hash, NULL);' \
+          'gnomebt_device_get_properties(device, &hash, NULL);' \
+        --replace-fail 'adapter_get_properties(adapter, &hash, NULL);' \
+          'gnomebt_adapter_get_properties(adapter, &hash, NULL);' \
+        --replace-fail 'manager_list_adapters(priv->manager, &array, NULL);' \
+          'gnomebt_manager_list_adapters(priv->manager, &array, NULL);' \
+        --replace-fail 'manager_default_adapter(priv->manager, &default_path, NULL);' \
+          'gnomebt_manager_default_adapter(priv->manager, &default_path, NULL);' \
+        --replace-fail 'adapter_start_discovery(adapter, NULL);' \
+          'gnomebt_adapter_start_discovery(adapter, NULL);' \
+        --replace-fail 'adapter_stop_discovery(adapter, NULL);' \
+          'gnomebt_adapter_stop_discovery(adapter, NULL);'
+      substituteInPlace lib/test-agent.c \
+        --replace-fail 'device_get_properties(device, &hash, NULL);' \
+          'gnomebt_device_get_properties(device, &hash, NULL);'
+      substituteInPlace applet/notify.c \
+        --replace-fail \
+          'notify = notify_notification_new(summary, message, icon_name, NULL);' \
+          'notify = notify_notification_new(summary, message, icon_name);'
+    '';
+
+    nativeBuildInputs = [
+      gnomeDocUtils
+      intltool
+      libxml2
+      pkg-config
+    ];
+
+    buildInputs = [
+      GConf
+      dbus-glib
+      glib
+      gtk2
+      libnotify
+      libunique
+      libXi
+      libx11
+      nautilus-sendto
+    ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu89 -Wno-error=format-security -fcommon";
+
+    meta = {
+      description = "GNOME 2 Bluetooth device management (applet, wizard, properties)";
+      homepage = "https://download.gnome.org/sources/gnome-bluetooth/";
+      license = lib.licenses.lgpl21Plus;
+      platforms = lib.platforms.linux;
+    };
+  };
+
   gnome-color-manager = stdenv.mkDerivation rec {
     pname = "gnome-color-manager";
     version = "2.32.0";
@@ -2545,7 +2620,7 @@ fi' ':'
   };
 in
 rec {
-  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-color-manager gnome-system-monitor gnome-utils gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vte zenity;
+  inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gnome-control-center gnome-desktop gnome-icon-theme gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-bluetooth gnome-color-manager gnome-system-monitor gnome-utils gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vte zenity;
 
   gnome2-core = buildEnv {
     name = "gnome2-core";
@@ -2560,6 +2635,7 @@ rec {
       gnome-control-center
       gnome-desktop
       gnome-applets
+      gnome-bluetooth
       gnome-color-manager
       gnome-utils
       libcanberra
