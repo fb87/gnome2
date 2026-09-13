@@ -537,7 +537,10 @@ let
 
     src = sources.metacity;
 
-    patches = [ ./patches/metacity-disable-canberra.patch ];
+    patches = [
+      ./patches/metacity-disable-canberra.patch
+      ./patches/metacity-fallback-default-icon.patch
+    ];
 
     nativeBuildInputs = [
       gettext

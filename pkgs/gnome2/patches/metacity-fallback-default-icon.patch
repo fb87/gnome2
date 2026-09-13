@@ -1,0 +1,35 @@
+--- a/src/ui/ui.c	2026-09-13 07:30:19.345147557 +0700
++++ b/src/ui/ui.c	2026-09-13 07:30:35.348298938 +0700
+@@ -749,11 +749,16 @@
+                                                    0,
+                                                    NULL);
+ 
+-      g_assert (default_icon);
++      if (default_icon == NULL)
++        {
++          default_icon = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8,
++                                          META_ICON_WIDTH, META_ICON_WIDTH);
++          gdk_pixbuf_fill (default_icon, 0x00000000);
++        }
+     }
+ 
+   g_object_ref (G_OBJECT (default_icon));
+-  
++
+   return default_icon;
+ }
+ 
+@@ -784,7 +789,12 @@
+                                                    0,
+                                                    NULL);
+ 
+-      g_assert (default_icon);
++      if (default_icon == NULL)
++        {
++          default_icon = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8,
++                                          META_MINI_ICON_WIDTH, META_MINI_ICON_WIDTH);
++          gdk_pixbuf_fill (default_icon, 0x00000000);
++        }
+     }
+ 
+   g_object_ref (G_OBJECT (default_icon));
