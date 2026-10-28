@@ -2438,12 +2438,15 @@ fi' ':'
       libxext
       libxfixes
       libxrender
+      libICE
+      libSM
       zenity
     ];
 
     configureFlags = [
-      "--disable-compositor"
+      "--enable-compositor"
       "--disable-scrollkeeper"
+      "--enable-sm"
     ];
 
     env.NIX_CFLAGS_COMPILE = "-std=gnu89";
@@ -2969,8 +2972,9 @@ in
 rec {
   inherit GConf ORBit2 at-spi2-atk at-spi2-core bug-buddy file-roller gcalctool gconf-editor gdm gnome-backgrounds gnome-control-center gnome-desktop gnome-icon-theme gnome-icon-theme-symbolic gnome-keyring gnome-menus gnome-mime-data gnome-netstatus gnome-nettool gnome-panel gnome-session gnome-settings-daemon gnome-terminal gnome-themes gnome-vfs gtkBuilderConvert gtkEngines gtksourceview gucharmap gvfs libIDL libart_lgpl libbonobo libbonoboui libglade libgnome libgnome-keyring libgnomecanvas libgnomekbd libgnomeprint libgnomeprintui libgnomeui libgtop libgweather libsoup libunique libwnck metacity mousetweaks nautilus nautilus-sendto eog evince gedit gnome-applets gnome-bluetooth gnome-color-manager gnome-system-monitor gnome-user-share gnome-utils gtk-vnc gtkmm2 libcanberra seahorse seahorse-plugins totem-pl-parser vinagre vino vte zenity;
 
-  gnome2-core = buildEnv {
-    name = "gnome2-core";
+  gnome2-core = let
+    base = buildEnv {
+      name = "gnome2-core-base";
     paths = [
       GConf
       ORBit2
@@ -3043,5 +3047,22 @@ rec {
       seahorse-plugins
       totem-pl-parser
     ];
+    };
+    defaults = stdenv.mkDerivation {
+      name = "gnome2-gconf-defaults";
+      dontUnpack = true;
+      installPhase = ''
+      mkdir -p $out/etc/gconf/gconf.xml.defaults
+      for schema in ${base}/etc/gconf/schemas/*.schemas; do
+        ${GConf}/bin/gconftool-2 \
+          --direct \
+          --config-source=xml:readwrite:$out/etc/gconf/gconf.xml.defaults \
+          --install-schema-file="$schema" >/dev/null
+      done
+      '';
+    };
+  in buildEnv {
+    name = "gnome2-core";
+    paths = [ base defaults ];
   };
 }

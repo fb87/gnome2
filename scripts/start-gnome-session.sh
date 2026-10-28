@@ -93,18 +93,17 @@ export GTK_PATH="$GNOME2_CORE/lib/gtk-2.0"
 export XCURSOR_PATH="$GNOME2_CORE/share/icons"
 export XCURSOR_THEME="whiteglass"
 mkdir -p "\$XDG_DATA_HOME" "\$XDG_CONFIG_HOME"
+printf '%s\n' "xml:readonly:$GNOME2_CORE/etc/gconf/gconf.xml.defaults" > "\$HOME/.gconf.path"
 
 eval "\$(dbus-launch --sh-syntax)"
 
 GCT="$GNOME2_CORE/bin/gconftool-2"
-for f in "$GNOME2_CORE"/etc/gconf/schemas/*.schemas; do
-  "\$GCT" --install-schema-file="\$f" >/dev/null
-done
 "\$GCT" --load "$GNOME2_CORE/etc/gconf/schemas/panel-default-setup.entries"
 "\$GCT" --set --type=string /desktop/gnome/background/picture_filename \\
   "$GNOME2_CORE/share/pixmaps/backgrounds/gnome/nature/Aqua.jpg"
 "\$GCT" --set --type=string /desktop/gnome/background/picture_options "zoom"
 "\$GCT" --set --type=string /desktop/gnome/peripherals/mouse/cursor_theme "whiteglass"
+"\$GCT" --set --type=bool /apps/metacity/general/compositing_manager true
 
 exec "$GNOME2_CORE/bin/gnome-session"
 EOF
